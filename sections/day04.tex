@@ -1,0 +1,196 @@
+\subsection{Convex Functions}
+
+\subsubsection{The Epigraph}
+
+\begin{defn}{Convex Functions}{}
+Let $S \subseteq \reals^n$ be a non-empty, convex set and $f: S \rightarrow \reals$
+\medskip\\
+$f$ is \textbf{convex} iff 
+		$\forall 
+		\vx, \vy \in S, \lambda \in [0, 1]$ it holds that
+		\begin{frml}
+		f\big(\lambda\vx + (1 - \lambda)\vy\big) \leq \lambda f(\vx)
+		+ (1 - \lambda)f(\vy)
+		\end{frml}
+		\medskip\\
+$f$ is \textbf{strictly convex} iff 
+		$\forall 
+		\vx, \vy \in S, \vx \neq \vy, \lambda \in (0, 1)$ it holds that
+		\begin{frml}
+		f(\lambda\vx + (1 - \lambda)\vy) < \lambda f(\vx)
+		+ (1 - \lambda)f(\vy)
+		\end{frml}
+
+\end{defn}
+In 2 dimensions
+this is essentially just saying that, for any secant line between 2 
+points, the function value has to be "under the secant line".
+
+Note a few properties of convex functions:
+\begin{itemize}
+	\item
+		$f$ is convex iff $-f$ is \textit{concave.}
+	\item
+		$\forall c \geq 0, cf$ is convex if $f$ is convex
+	\item
+		the sum of convex functions is convex
+\end{itemize}
+
+\begin{defn}{Epigraph}{}
+Let $S \subseteq \reals^n$ be a convex, non-empty set, and 
+$f: S \rarrw \reals$. The \textbf{epigraph} of $f$ is defined as
+\begin{frml}
+Ep(f) = \bigg\{ 
+	\begin{bmatrix}
+		\vx \\ \beta \\
+	\end{bmatrix}
+	\in \reals^{n + 1} : \vx \in S, \beta \in \reals, \beta \geq f(\vx)
+\bigg\}
+\end{frml}
+\end{defn}
+
+\textit{In 2 dimensions, you can sort of think of this as the area over the 
+curve, or like the... air of a hilly 3-D landscape. 
+It's everything above the function, if we added an extra dimension to
+help visualize our space.}
+
+
+\begin{theo}{}{}
+Suppose $S \subseteq \reals^n$ is a convex, non-empty set
+and $f : S \rarrw \reals$. Then $f$ is a convex function iff
+$Ep(f)$ is a convex set.
+\end{theo}
+
+\textit{The proof of this is omitted, but is rather trivial with respect
+to the definition of convex sets and functions.}
+
+\subsubsection{The Support Theorem}
+
+\begin{theo}{Support Theorem}{}
+
+$S \subseteq \reals^n$ non-empty, convex set. Let $\bx \in Bndr(S)$. Then
+$\exists$ a hyperplane containing $\bx \in \reals^n$ such that all of $S$ is
+contained in one of the two half-spaces.
+\end{theo}
+
+\textit{Intuitively, we can think of this as follows: If a set of convex, then any of
+it's boundary points define a tangent hyperplane which contains the boundary
+point but \textbf{does not split the set}. In other words, the tangent hyperplane
+\textbf{supports}, or holds the set up.}
+
+\begin{theo}{}{}
+Let $S \in \reals^n$ be a non-empty, open, convex-set, and let 
+$f: S \rarrw \reals$ be continuously differentiable.
+\medskip\\
+Then
+\begin{itemize}
+	\item
+		$f$ is convex iff $\forall \vx, \bx \in S , \;
+		f(\vx) \geq f(\bx) + \nabla f(\bx)^T(\vx - \bx)$
+	\item
+		$f$ is strictly convex iff $\forall \vx, \bx \in S , \; \vx \neq \bx, \;
+		f(\vx) > f(\bx) + \nabla f(\bx)^T(\vx - \bx)$
+\end{itemize}
+\end{theo}
+
+\textit{This is basically showing us that the tangent hyperplane is the only possible
+candidate for supporting hyperplane on the boundary of $Epi(f)$.}
+
+
+\begin{theo}{}{}
+Let $S \in \reals^n$ be a non-empty, open, convex set. Let 
+$f: S \rarrw \reals$ be twice continuously differentiable. 
+\medskip\\
+Then $f$ is convex iff 
+$\forall \vx \in S, \nabla^2 f(\vx)$ is \textit{Positive Semi-Definite}(PSD).
+\end{theo}
+
+\begin{proof}[]
+($\impliedby$): Suppose $\nabla^2 f(x)$ is PSD for all points $\vx \in S$.
+By Taylor $\forall \vx, \bx \in S$
+\begin{frml}
+	f(\vx) = f(\bx) + \nabla f(\bx)^T(\vx - \bx)
+	+ \frac{1}{2} (\vx - \bx)^T \nabla^2f(\vz)(\vx - \bx)
+\end{frml}
+where $\vz$ is some point between $\vx, \bx$ also in $S$, since $S$ is convex.
+Now, note that the last term is $\geq 0$, since the Hessian is PSD.
+Thus,
+\begin{frml}
+	f(\vx) \geq f(\bx) + \nabla f(\bx)^T (\vx - \bx)
+\end{frml}
+and so $f$ is convex by Thm. 5.3.
+
+($\implies$): Suppose $\exists \; \bx \in S$ s.t. $\nabla^2 f(\bx)$ is \textbf{not} PSD.
+Then $\exists \; \vd \in \reals^n$ such that $\vd^T \nabla^2 f(\bx) \vd < 0$.
+Then, by continuity of $\nabla^2 f$, there exists an epsilon neighborhood around 
+$\bx$ such that $\forall \vz$ in this neighborhood, $\vd^T \nabla^2 f(\vz) \vd < 0$.
+For any $\alpha > 0$ small enough such that $\vx = \bx + \alpha \vd$ in this
+neighborhood, then by Taylor
+\begin{frml}
+	f(\vx) &= f(\bx) + \nabla f(\bx)^T (\vx - \bx) + \frac{1}{2}(\vx - \bx)^T
+	\nabla^2 f(\vz) (\vx - \bx) \\
+		   &= f(\bx) + \nabla f(\bx)^T (\vx - \bx) + \frac{1}{2}(\alpha \vd)^T
+	\nabla^2 f(\vz) (\alpha \vd) \\
+		   &= f(\bx) + \nabla f(\bx)^T (\vx - \bx) + \frac{1}{2}\alpha^2 \vd^T
+	\nabla^2 f(\vz) \vd \\
+\end{frml}
+
+Note also that
+
+\begin{frml}
+	\alpha^2 \vd^T \nabla^2 f(\vz) \vd < 0 
+	\implies f(\vx) < f(\bx) + \nabla f(\bx) (\vx - \bx)
+\end{frml}
+so $f$ is not convex, again by Thm 5.3.
+\end{proof}
+
+\begin{theo}{}{}
+Let $S \in \reals^n$ be a non-empty, open, convex set. Let 
+$f: S \rarrw \reals$ be twice continuously differentiable.
+\medskip\\
+Then, if $\forall \vx \in S, \; \nabla^2 f(\vx)$ is PD, then $f$ is 
+\textbf{strictly convex}.
+\end{theo}
+
+\begin{proof}[]
+Again by Taylor, $\forall \vx, \bx \in S$
+\begin{frml}
+	f(\vx) = f(\bx) + \nabla f(\bx)(\vx - \bx)
+	+ \frac{1}{2}(\vx - \bx)^T\nabla^2 f(\vz)(\vz - \bx)
+\end{frml}
+
+As before, the last term here is strictly $> 0$, so $f(\vx) > f(\bx) + 
+\nabla f(\bx) (\vx - \bx)$, which shows that $f$ is strictly convex.
+\end{proof}
+
+\textit{Note: $f$ strictly convex $\notimplies$ $\forall \vx \in S, \nabla^2 f(\vx)$ is 
+PD. It \textit{does} imply that it's PSD everywhere.
+To see a simple example, take $x^4$. This function is twice diff., and strictly
+convex, but the second derivative at $x = 0$ is $0$.}
+
+
+\begin{theo}{}{}
+Let $S \subseteq \reals^n$ non-empty, convex, open, and $f: S \rarrw \reals$
+be a convex, continuously differentiable function. Finally, let 
+$P: min f(\vx), \; \vx \in S$.
+\medskip\\
+Then $\bx \in S$ is a global minimum of P iff $\bx$ is a local minimum iff it's a
+stationary point. 
+\medskip\\
+\textit{(i.e. in a convex fn, if you are a local min, you are
+a global min).}
+\end{theo}
+
+\begin{proof}[]
+First note if $\bx$ is a global min, then it is a local min, which finally 
+means it is a stationary point.
+
+By convexity, and thm 5.3, 
+$\forall \vx \in S$, $f(\vx) \geq f(\bx) + \nabla f(\bx) (\vx - \bx)$.
+Since $\bx$ is a stationary point, $\nabla f(\bx) (\vx - \bx)$ is $0$, and thus
+$\forall \vx \in S, \; f(\vx) \geq f(\bx)$ $\implies$ $\bx$ is a global minimum.
+
+Finally, note that if $f$ is strictly convex, then the global min is strict as 
+well.
+\end{proof}
+

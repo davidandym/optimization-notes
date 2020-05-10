@@ -1,0 +1,250 @@
+
+\subsection{Naive Newton}
+
+Recall that a single step of Newton's method can be summarized
+in the following way (assuming the Jacobian is invertible):
+
+\begin{frml}
+	\mat{\vx^{(k+1)} \\ \vy^{(k+1)} \\ \vz^{(k+1)}} =
+	\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}} - 
+	\nabla^T F\bigg(\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}\bigg)^{-1}
+	F\bigg(\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}\bigg)
+\end{frml}
+
+This is our newton iteration step, and 
+as long as our $\vx, \vz > \vzero$, our Jacobian will always be invertible. 
+However, in practice we'll never actually invert out Jacobian 
+(it's far too expensive). Instead we'll typically just choose to solve the linear 
+system:
+
+\begin{frml}
+	\nabla^T F\bigg(\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}\bigg)
+	\bigg(
+	\mat{\vx^{(k+1)} \\ \vy^{(k+1)} \\ \vz^{(k+1)}} -
+	\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}
+	\bigg)
+	= - 
+	F\bigg(\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}\bigg)
+\end{frml}
+
+Let's rename this middle section, which are the variables that we're solving for,
+to $ \mat{\Delta \vx^{(k1)} & \Delta \vy^{(k)} & \Delta \vz^{(k)}}$. This 
+represents the variables in the linear system which we are going to be solving 
+for. This changes our system into:
+
+\begin{frml}
+	\nabla^T F\bigg(\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}\bigg)
+	\bigg(
+	\mat{\Delta \vx^{(k1)} \\ \Delta \vy^{(k)} \\ \Delta \vz^{(k)}}
+	\bigg)
+	= - 
+	F\bigg(\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}\bigg)
+\end{frml}
+
+\textit{\textbf{Note:} This $\Delta^k$ vector is \textit{exactly} our Newton Direction 
+(it's what we will add to the next iterate).}
+
+However, we still cannot just apply Newton, because nothing about this 
+Newton direction is guaranteed to keep $\vx, \vz \geq \vzero$. 
+A simple solution to this is the Naive Newton 
+Algorithm~(Algorithm \ref{alg:naive-newton}).
+
+\begin{algorithm}\label{alg:naive-newton}
+\caption{Naive-Newton Algorithm}
+	\KwIn{$F$}
+	\KwOut{$\vx^*, \vy^*, \vz^*$}
+	$\mat{\vx^{(0} & \vy^{(0)} & \vz^{(0)}} \leftarrow $ initialize a feasible guess\;
+	\For{$k = 1, 2, \ldots$ until $F\bigg(\mat{\vx^{(k)} & \vy^{(k)} & \vz^{(k)}}\bigg) \approx \vzero$ }{
+		Solve 
+	$\nabla^T F\bigg(\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}\bigg)
+	\bigg( \mat{\Delta \vx^{(k)} \\ \Delta \vy^{(k)} \\ \Delta \vz^{(k)}} \bigg)
+	= - 
+	F_{\epsilon_k\beta^{(k)}}\bigg(\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}\bigg)$\;
+	$\mat{\vx^{(k+1)} \\ \vy^{(k+1)} \\ \vz^{(k+1)}} \leftarrow 
+	\max_{\alpha^{(k)}}\bigg[
+	\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}} + 
+\alpha^{(k)} \mat{\Delta \vx^{(k)} \\ \Delta \vy^{(k)} \\ \Delta \vz^{(k)}}\bigg]
+	\st \vx^{(k+1}), \; \vz ^{(k+1})> 0$\;
+	$k \leftarrow k + 1$\;
+	}
+\end{algorithm}
+
+In other words, naive newton will 
+go as far as it can in the direction $\Delta$ such that positivity of
+$\vx, \vz$ is maintained.
+
+However, in practice this naive algorithm typically will fail to converge.
+"Naive Newton" will always have step sizes which are too small
+and will often get stuck. 
+
+
+\subsection{Interior Point Methodology}
+
+At a high level, the solution to Naive Newton's failure is to try to
+``steer''
+towards the ``inside'' of the feasible region, while moving towards the goal. 
+We allow the complimentarity constraint to relax a bit while we attempt to optimize,
+allowing us to make larger strides towards the root of $F$ the other components
+of $F$, while additionally
+guiding our solution to a more and more ``complimentary'' solution with respect
+to $\vx$ and $\vz$.  We'll formalize this below.
+
+\subsubsection{The Central Path}
+
+\begin{defn}{$F_\tau$}{}
+For all $\tau > 0$, we will define $F_\tau: \reals^{n+m+n}
+\rarrw \reals^{n+m+n}$ as
+
+\begin{frml}
+	F_\tau(\mat{\vx \\ \vy \\ \vz}) = 
+	\mat{Q\vx + \vc + A^T\vy - \vz \\
+		A\vx - \vb \\
+	\vz \circ \vx - \tau\vone}
+\end{frml}
+\end{defn}
+
+What does this say? For a given root of $F_\tau$ we \textit{don't quite} have
+complimentarity in $\vx, \vz$.
+Namely, if $F_\tau(\mat{\vx & \vy & \vx)} 
+	= \vzero$, then we have $\forall i \; \vx_i\vz_i = \tau$,
+and in particular that must also mean that $\vx_i, \vz_i > 0$. 
+\textit{All} of our components are $> 0$, and the Hadamard product of each 
+component is equal.
+
+\begin{theo}{}{}
+All notation as above.
+
+\medskip
+If $\exists \mat{\vx \\ \vy \\ \vz} \st F( \mat{\vx \\ \vy \\ \vz})_{1:n+m} = \vzero$, AND $\vx, \vz > 0$, then 
+\begin{frml}
+	\forall \tau > 0, \; \exists \text{\textit{ unique vector}}
+\mat{\vx_\tau \\ \vy_\tau \\ \vz_\tau} \st 
+F_\tau(\mat{\vx_\tau \\ \vy_\tau \\ \vz_\tau}) = \vzero 
+\text{ and } \vx_\tau, \vz_\tau > \vzero \\
+\end{frml}
+\textit{Note: $\vx_\tau \rarrw \vx^*, \vz_\tau \rightarrow \vz^*$ solution to QP as $\tau \rarrw 0$}
+\end{theo}
+
+\textit{No proof}.
+
+This theorem is saying is that if we have a solution which solves the 
+first 2/3rds of our problem (i.e. the complimentarity between $\vx$ and $\vz$ 
+does not hold, but everything else is satisfied), then for all $\tau > 0$, we
+have a solution which is \textit{jsut as good}, except the complimentarities of
+all components of $\vx \circ \vz$ are equal but not $0$.
+
+\begin{defn}{Central Path}{}
+The \textbf{Central Path} is the set of solutions
+\[\{\mat{\vx_\tau & \vx_\tau & \vz_\tau} : \tau > 0\}\] 
+
+\textit{Intuitively, if we are ``on'' the central path, we might 
+think of following it down the decreasing $\tau$ direction, to approach the 
+solution where $\tau = 0$, which is exactly a solution to our original QP.}
+\end{defn}
+
+\subsubsection{Central Path Neighborhoods}
+
+\begin{defn}{Average Complimentarity}{}
+For some $\mat{\vx & \vy & \vz} \in \reals^{n+m+n} \st
+\vx, \vz > \vzero$ we define the \textbf{average complimentarity} as 
+	
+$$\beta = \frac{\vx^T\vz}{n}$$
+\end{defn}
+
+\begin{defn}{$N_2$ Neighborhood}{}
+For fixed parameter $\gamma \in (0,1)$, define 
+$$N_2(\gamma)
+= 
+\{ \mat{\vx & \vy & \vz} \in \reals^{n+m+n} : \vx,\vz > \vzero, \; ||\vz \circ \vx - \beta||_2
+\leq \gamma\beta\}$$ 
+\end{defn}
+This neighborhood is basically checking how far each 
+complimentarity "violation" (i.e. each component of $\vz \circ \vx$ is off of 
+the average complimentary violation $\beta$). The smaller the gamma, the
+more you restrict the complimentarity of $\vx$ and $\vz$ to be uniform
+across each component.
+
+\textit{Note: Remember that if the first 2/3rds
+of $F$ are equal to $\vzero$ and every component of $\vz \circ \vx$ is exactly
+the average, then \textit{you're on the central path}! 
+So you can think of 
+$N_2$ as a space defined around the central path, whose size is controlled by 
+$\gamma$, although $N_2$ itself says nothing about the feasibility of the
+other 2/3rds of our function $F$.}
+
+\begin{defn}{$N_{-\infty}$ Neighborhood}{}
+For fixed parameter $\delta \in (0,1)$, define 
+$$N_{-\infty}(\delta) = 
+	\{ \mat{\vx & \vy & \vz} \in \reals^{n+m+n} : \vx,\vz > \vzero, \;
+	\forall i \; \vx_i\vz_i \geq \delta\beta \}$$ 
+\end{defn}
+
+This neighborhood is much less restrictive
+than the $N_2$ neighborhood. This neighborhood only requires that each component
+must violate their complimentarity by at least some fraction of $\beta$, the
+average complimentarity. 
+
+\textit{Note that, in this case, as our parameter $\delta$ \textbf{increases} this 
+neighborhood becomes tighter. It forces each component to be \textit{closer}
+to the average, meaning we're closer to the central path as we also optimize
+for the rest of our constraints. As $\delta \rarrw 0$, this neighborhood 
+becomes less restrictive. Since we can have some 
+components with very small complentarity violations, this allows other 
+components to compensate in drastic ways, which allows a much larger space 
+of residents. Note again that this neighborhood is not defined with the other
+values of $F$ in mind. It it solely worried about the complimentarity and 
+positivity of $\vx$ and $\vz$.}
+
+\subsubsection{Interior Point Algorithm}
+
+The algorithm is defined in \ref{alg:int-point-alg}.
+
+\begin{algorithm}\label{alg:int-point-alg}
+\caption{Interior-Point Algorithm}
+	\KwIn{
+	$\epsilon_{min}, \epsilon_{max} \st 0 < \epsilon_{min} < \epsilon_{max} < 1$\;
+\textbf{short step} ($N_2$ neighborhood) or \textbf{long step} ($N_{-\infty}$ neighborhood)\;
+$\gamma$ if short step or $\delta$ if long step\;
+}
+	\KwOut{$\vx^*, \vy^*, \vz^*$}
+	$\mat{\vx^{(0} & \vy^{(0)} & \vz^{(0)}} \leftarrow $ init. guess $\in N_2(\gamma)$ or $\in N_{-\infty}(\delta)$\;
+	\For{$k = 1, 2, \ldots$ until $F\bigg(\mat{\vx^{(k)} & \vy^{(k)} & \vz^{(k)}}\bigg) \approx \vzero$ }{
+		$\epsilon_k \leftarrow  \epsilon_{\min} < \epsilon_k < \epsilon_{\max}$ \;
+		$\beta^{(k)} \leftarrow \frac{\vz^{(k)T}\vx^{(k)}}{n}$\;
+	$\mat{\Delta \vx^{(k)} \\ \Delta \vy^{(k)} \\ \Delta \vz^{(k)}} \leftarrow $
+	solution to
+	$\nabla^T F\bigg(\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}\bigg)
+	\bigg( \mat{\Delta \vx^{(k)} \\ \Delta \vy^{(k)} \\ \Delta \vz^{(k)}} \bigg)
+	= - 
+	F_{\epsilon_k\beta^{(k)}}\bigg(\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}}\bigg)$\;
+	$\mat{\vx^{(k+1)} \\ \vy^{(k+1)} \\ \vz^{(k+1)}} \leftarrow 
+	\max_{\alpha^{(k)}}
+	\mat{\vx^{(k)} \\ \vy^{(k)} \\ \vz^{(k)}} + 
+	\alpha^{(k)} \mat{\Delta \vx^{(k)} \\ \Delta \vy^{(k)} \\ \Delta \vz^{(k)}}
+	\in N_2(\gamma) \text{ or } N_{-\infty}(\delta)$\;
+	$k \leftarrow k + 1$\;
+	}
+\end{algorithm}
+
+
+Each Newton step is optimizing an $F_\tau$, where 
+$\tau = \epsilon_k\beta^{(k)}$ (The Jacobian is always the same, regardless of
+$\tau$). 
+
+Notice that if $\epsilon_k$ is close to 0, then this 
+is a basic Newton step with respect to our original $QP$. That is, we are taking
+a step in the direction that finds a solution to the ``top 2 chunks'' of F, as
+well as the ``bottom chunk'' of $F$.
+If $\epsilon_k$ is close to 1 then we are not \textit{improving} the complimentarity of 
+$\vz, \vx$ but rather we are only moving ourselves towards equivalent 
+complimentarity of all components of $\vz \circ \vx$ 
+(i.e. moving towards the central path)
+while still optimizing for
+the top ``chunks'' of $F$.
+
+\textit{Note: Typically in practice, it is common to alternate $\epsilon_k$ between values close
+to 1 and close to 0 to alternate taking steps towards complementarity and taking
+steps towards the ``central path''. }
+
+This algorithm gives us a way to solve a QP with inequalities in the constraints
+using an iterative method.

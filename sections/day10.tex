@@ -1,0 +1,137 @@
+\subsection{Deriving the KKT Conditions}
+
+We will derive the KKT conditions by making a slow march through
+a series of propositions.
+
+Let's start by considering the problem P, defined as:
+\begin{frml}
+	\min f(x) \st  &g_1(x) \leq 0, \\
+						&g_2(x) \leq 0, \\
+						&\vdots \\
+						&g_m(x) \leq 0, \\
+						&\vx \in S
+\end{frml}
+
+where we write $\vg(\vx) = \mat{g_1(\vx) \\ g_2(\vx) \\ \vdots \\ g_m(\vx)} 
+\st \vg: \reals^n \rarrw \reals^m$, with constraints $\vg(\vx) \leq \vzero$.
+
+\begin{defn}{Active Constraints}{}
+For any $\vx \in S$, feasible in $P$,
+the \textbf{active constaints} are 
+\[
+	\mathcal{A}_\vx = \{ i : g_i(\vx) = 0\}
+\]
+\textit{In other words, they are the constraints for which $\vx$ is on the ``boundary''.}
+\end{defn}
+
+\begin{prop}{KKT Prop 1}{}
+If $\vx \in S$, feasible (satisfies $\vg$), and is a \textit{local min}
+of $P$, then there does not exist a direction $\vd \in \reals^n$ which
+is simultaneously a descent direction for $f$ and all active constraints, $g_i
+\st i \in \mathcal{A}_\vx$.
+\end{prop}
+
+\begin{proof}[]
+If such a $\vd$ exists then $\exists \; \alpha > 0$ small enough such that
+\begin{frml}
+	\forall i \in \mathcal{A}_\vx, g_i(\vx + \alpha\vd) < g_i(\vx) = 0  \\
+	\forall i \notin \mathcal{A}_\vx, g_i(\vx + \alpha\vd) 
+	\approx g_i(\vx) < 0 \\
+\end{frml}
+thus $\vx + \alpha\vd$ is feasible, and $f(\vx + \alpha\vd) < f(\vx)$
+and thus $\vx$ is not a local min.
+\end{proof}
+
+\begin{prop}{KKT Prop 2}{}
+If $\vx \in S$ is feasible and a local min of $P$ then
+$\centernot \exists \vd \in \reals^n$ (direction, $\neq \vzero$), s.t.
+$J^T\vd < 0$, where $J^T = \mat{\nabla f^T(x) \\ 
+\nabla \vg_{\mathcal{A}_\vx}^T(\vx)}$
+\end{prop}
+
+\begin{proof}[]
+Immediate consequence of prop 1, $J$ represents the gradients of $f$
+and all active constrants $\mathcal{A}_\vx$, and
+if such a $d$ exists, then it is a descent direction for both $f$ and all 
+active constraints $\mathcal{A}_\vx$.
+\end{proof}
+
+\begin{prop}{KKT Prop 3}{}
+If $\vx \in S$, feasible, is a local min of $P$, then
+$\exists \vlambda \geq \vzero, \vlambda \neq \vzero, \st J\vlambda = \vzero$
+\end{prop}
+
+\begin{proof}[]
+This is equivalent to Prop 2, by Gordon's Theorem.
+\end{proof}
+
+\begin{prop}{KKT Prop 4}{}
+If $\exists \vx \in S$, feasible, is a local min of $P$,
+then $\exists \mat{\beta \\ \vlambda} \in \reals^{1 + m}$, non-zero, such that
+\begin{frml}
+\mat{\nabla f(\vx)  & \nabla g_1(\vx)  & \ldots  & \nabla g_m(\vx)}
+\mat{\beta \\ \vlambda} = \vzero, \st \forall i = 1, \ldots, m \; \vlambda_i 
+g_i(\vx) = 0
+\end{frml}
+\end{prop}
+
+Note that this is just a restating of Prop 3 where we include \textit{all} 
+constraints here (not just active ones), but
+if a constraint is not active (say $j$ is not active), then $\vlambda_j$ must
+be zero.
+
+Fritz-John is a re-statement of Prop 4, but utilizing the definition of the
+\textit{Jacobian}:
+
+\begin{defn}{The Jacobian}{}
+The \textbf{Jacobian} of $\vg$ is defined as
+\begin{frml}
+	\nabla \vg(\vx) = \mat{\nabla g_1(\vx) & | & \nabla g_2(\vx) & | & \ldots
+										   & | & \nabla g_m(\vx)}
+\end{frml}
+\end{defn}
+
+Using the above definition and notes, we can rewrite Prop 4 as the Fritz-John
+Optimality Conditions:
+
+\begin{theo}{Fritz-John Optimality Conditions}{}
+If $\vx \in S$, feasible in
+$P$, is a local min of $P$, then $\exists \vlambda \in \reals^m, \beta \in \reals \st$
+\begin{frml}
+	&\beta \nabla f(\vx) + \nabla \vg(\vx) \vlambda = \vzero, \\
+	&\vlambda^T\vg(x) = 0, \\
+	&\text{and } \mat{\beta \\ \vlambda} \geq \vzero, \neq \vzero \\
+\end{frml}
+Which we can similarly write as...
+\begin{frml}
+	&\beta \nabla f(\vx) + \sum_{i=1}^m \nabla \vg_i(\vx) \vlambda_i = \vzero, \\
+	&\sum_{i=1}^m \vlambda_i\vg_i(x) = 0, \\
+	&\text{and } \beta, \vlambda_1, \vlambda_2, \ldots, \vlambda_m \geq 0, 
+	\text{but not all $0$}
+\end{frml}
+\end{theo}
+
+Again, there is no proof. This is just a re-statement of proposition 4, using the
+definition of a Jacobian.
+Finally, this leads us to the KKT conditions...
+
+\begin{theo}{Karush-Kuhn-Tucker Conditions}{}
+If $\vx \in S$, feasible in
+$P$ is a local min of $P$ and satisfies the "constraint qualifications" (cq) that
+$\{\nabla g_i\}_{i \in \mathcal{A}_{\vx}}$ are linearly independent, then
+\begin{frml}
+	\exists \vlambda \in \reals^m \st &\nabla f(\vx) + \nabla \vg(\vx)\vlambda
+	= \vzero, \\
+									  &\vlambda^T\vg(x) = 0, \\
+									  &\text{and } \vlambda \geq \vzero
+\end{frml}
+\end{theo}
+
+\begin{proof}[]
+This follows from Fritz-John. The linear independence of $\{\nabla \vg_i \}_{i \in
+\mathcal{A}_\vx}$ forbids $\beta$ from being $0$. Thus, we can divide
+$\mat{\beta \\ \vlambda} / \beta$ which sets $\beta = 1$, and thus we only
+require that $\vlambda \geq \vzero$ (since $\beta > 0$, the "but not all zero"
+constraint is already satisfied). The $\vlambda_i$ are called the KKT 
+multipliers.
+\end{proof}

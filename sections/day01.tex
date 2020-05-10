@@ -1,0 +1,163 @@
+
+% \title{Introduction to Problem Setting}
+% \author{Non-Linear Optimization - 553.762}
+% \date{}
+% 
+% \begin{document}
+
+% \maketitle
+\pagebreak
+\section{Preliminaries}
+
+We start off by introducing some formal notation and fundamental theorems in topology.
+This is going to be a lot of definitions, so I apologize in advance for that.
+
+\subsection{Vectors}
+
+\begin{defn}{Magnitude}{}
+	The \textbf{magnitude} of a vector is, intuitively, what we can think of as the length
+	of that vector from the origin. It's defined as, $\forall \vx \in \reals^n$:
+\begin{frml}
+	||\vx|| = ||\vx||_2 = (\sum_{i=0}^{n} \vx_i^2)^{\frac{1}{2}}
+\end{frml}
+\end{defn}
+
+\begin{defn}{Distance}{}
+	The \textbf{distance} between two vectors $\vx, \vy$ is defined as $\forall \vx, \vy \in \reals^n$:
+	\begin{frml}
+		dist(\vx, \vy) = || x - y ||
+	\end{frml}
+\end{defn}
+
+\begin{defn}{Epsilon-Neighborhood}{}
+The \textbf{epsilon-neighborhood} of a vector $\vy\in\reals^n$ is defined $\forall \vx\in\reals^n,
+\epsilon>0$ as the set: 
+
+$$N_\epsilon (\vy) = \{ \vx \in \reals^n : dist(\vx, \vy) < \epsilon \}$$
+\end{defn}
+
+\subsection{Sets}
+
+Let $S \subseteq \reals^n$
+
+\begin{defn}{Interior and Boundary Point}{intboundpoint}
+
+	$\forall \vx \in \reals^n, \vx$ is an \textbf{interior point} of S, 
+		$\vx \in Int(S) \iff \exists \epsilon > 0 \st N_{\epsilon}(\vx) \subseteq S$
+
+\bigskip
+$\forall \vx \in \reals^n, \vx$ is a \textbf{boundary point} of S, $\vx \in Bndr(S)$, if
+$\forall \epsilon > 0$, $ N_{\epsilon}(\vx)$ contains a point in $S$ and a point in $S^C$.
+\end{defn}
+
+In other words, if there exists some small enough epsilon neighborhood of $\vx$ 
+which is entirely contained within $S$, then $\vx \in Int(S)$. The opposite
+of this is a boundary point, that is
+for \textbf{all} epsilon neighborhood around $\vx$, $\vx$ contains both a point
+in $S$ and a point outside of $S$. 
+\textit{Note that a point cannot be an interior point
+and a boundary point simultaneously, by definition.}
+
+\begin{defn}{Open and Closed Set}{openclosedset}
+$S$ is \textbf{open} if $\forall \vx \in S, \vx \in Int(S)$.
+That is, if $S = Int(S)$. 
+
+\bigskip
+$S$ is \textbf{closed} if all boundary points of $S$ are \textbf{in} $S$,
+i.e. if $Bndr(S) \subseteq S$. 
+\end{defn}
+
+To see some intuitive examples of open and closed sets, we can imagine subsets of
+a numberline
+\begin{itemize}
+\item The range [2,3] is closed in $\reals$, but not open.
+\item The range (2,3) is open, but not closed.
+\item The range [2, 3) is neither open nor closed.
+\item And finally, if we trivially consider $S = \reals$, then $S$ is both
+	open and closed, since it has no boundary points.
+\end{itemize}
+
+\begin{defn}{Bounded Set}{boundedset}
+$S$ is \textbf{bounded} if $\exists \epsilon > 0$ such that 
+$S \subseteq N_{\epsilon} ( \vzero )$.
+In other words, if it's sort of centered around the origin by some epsilon.
+
+\textit{We can imagine this as saying that our set }
+\end{defn}
+
+\begin{defn}{Compact Set}{compactset}
+$S$ is \textbf{compact} if for any sequence 
+$\{ \vx^i \}_{i=1}^{\infty} \subseteq S$, then there exists a convergent 
+subsequence $\{\vx^{i,j}\}_{j=1}^{\infty}$, and $\vy \in S$ such that
+$\vx^{i,j} \rightarrow \vy$.
+\end{defn}
+
+\begin{prop}{}{}
+For any $S \in \reals^n$, $S$ is open if and only if $S^C$ is closed.
+\end{prop}
+
+\begin{proof}[Proposition 1.1]
+Trivially, $Bndry(S) = Bndry(S^C)$.
+Also, each point in $S$ is either $Int(S)$ or $Bndry(S)$ but not both.
+Finally, $S$ is open iff $S = Int(S)$ which is true iff $Bndry(S) \subseteq S^C$
+which is true iff $Bndry(S^C) \subseteq S^C$, i.e. $S^C$ is closed.
+\end{proof}
+
+\begin{theo}{}{}
+$\forall S \in \reals^n$, nonempty, $S$ is compact iff $S$ is
+both closed and bounded.
+\end{theo}
+
+\begin{theo}{}{}
+If $S \in \reals^n$ is compact, and you have $f: S \rightarrow \reals$ continuous, 
+then $\exists \bar{\vx} \in S$ such that
+$\forall \vx \in S, f(\bar{x}) \leq f(\vx)$ and $f(\bar{\bar{\vx}}) \geq f(\vx)$.
+\end{theo}
+
+\subsection{Problem Setting}
+
+We will typically work with problems of the following form:
+Suppose $S \subseteq \reals^n$, $f: S \rightarrow \reals$.
+Define the problem P as: 
+\begin{frml}
+	\min \;&f(\vx) \st \vx \in S
+\end{frml}
+
+In this setting we call:
+\begin{itemize}
+	\item
+		$f$ the objective function
+	\item
+		$S$ the feasible region
+	\item
+		$\vx$ the decision variables
+\end{itemize}
+The set $S$ may contain equation constraints, and if $\vx \in S$ then we say that
+$\vx$ is feasible.
+Some definitions:
+
+\begin{defn}{Local and Global Minimum}{}
+If $\bar{\vx} \in S$ satisfies $\exists \epsilon > 0$ s.t. 
+$\forall \vx \in N_{\epsilon}(\bar{\vx}) \cap S$, $f(\bar{\vx}) \leq f(\vx)$, then
+$\bar{\vx}$ is a \textbf{local minimum}.
+
+If $\bar{\vx} \in S$ satisfies $\exists \epsilon > 0$ s.t. 
+$\forall \vx \in N_{\epsilon}(\bar{\vx}) \cap S$, $\vx \neq \bx$, $f(\bar{\vx}) < f(\vx)$, then
+$\bar{\vx}$ is a \textbf{strict local minimum}.
+
+\bigskip
+
+If $\bar{\vx} \in S$ satisfies $\forall \vx \in S, f(\bar{\vx}) \leq f(\vx)$ 
+then we call $\bx$ the \textbf{global minimum}, 
+
+If $\bar{\vx} \in S$ satisfies 
+$\forall \vx \in S, \vx \neq \bar{\vx}, f(\bar{\vx}) < f(\vx)$, 
+then $\bar{\vx}$ is a \textbf{strict global minimum}.
+
+\bigskip
+If $\bx$ is a global min of $f$, then we call $f(\bar{\vx})$ the 
+\textbf{optimal objective function value (oofv)}.
+\end{defn}
+
+If $\forall \epsilon > 0, \exists \vx \in S$, such that $f(\vx) < -\epsilon$,
+then P is unbounded, and has \textit{no global min}.

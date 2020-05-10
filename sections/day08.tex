@@ -1,0 +1,106 @@
+\subsection{Duality and the Simplex Tableau}
+
+Recall the Simplex Method and Simplex Tableau from Linear Programs 
+(\S~\ref{sec:simplex-method}).
+The same construction can be used in solving the dual problem, as well!
+Let LP be the following linear program:
+\begin{frml}
+	\min \vc^T\vx \st &\vA\vx = \vb,\\ &\vx \geq \vzero
+\end{frml}
+Let $B$ be a basis of LP, with the basic tableau:
+\begin{frml}
+	\mat{1 &  \vzero & \ldots & | & \vc_B^TB^{-1}\vb \\
+		\vzero  & I & \ldots & | & B^{-1}\vb}
+\end{frml}
+and basic solution $\bx = \mat{
+B^{-1}\vb \\ \vzero}$. Recall, additionally, that $\bx$ is feasible iff
+$\bx\geq\vzero$. 
+Set 
+$\by^T = \vc_B^TB^{-1} \in \reals^m$. Note that $\by$ is not necessarily 
+feasible in the dual problem, either.
+However, our choices of $\bx$ and $\by$ 
+vectors have the same objective function value (by design). 
+This means that a basic tableau for which both $\bx$ and $\by$ are feasible 
+has found the optimal solution for both LP and DP in $\bx$ and $\by$, respectively.
+
+The items needed to a basic tableau to be optimal, with vectors $\bx$ and $\by$,
+is:
+\begin{enumerate}
+	\item
+		Feasability of $\bx$:
+		\begin{enumerate}
+			\item $\vA\vx = \vb$
+			\item $\bx \geq \vzero$.
+		\end{enumerate}
+	\item Feasibility of $\by$ : $\by^T\vA \leq \vc^T$
+	\item Equivalent \textbf{ofv}s: $\vc^T\bx = \vb^T\by$
+\end{enumerate}
+
+Notice that 1(a) is \textit{always true!}. If $B$ is a valid basis of $A$,
+then it holds that $\mat{ B & | & N } \mat{B^{-1}\vb \\ \vzero}
+= \vb$. Thus, the choice of $\bx$ satisfies this constraint always.
+Additionally, by definition of $\by$ and $\bx$, 4 is always true as
+well.
+
+\textbf{Thus, solving the LP comes down to finding a basic tableau which satisfies 
+(1b) and (2).}
+(1b) is true precisely when $B^{-1}\vb \geq \vzero$.
+(2) is true precisely when the top row of the simplex is 
+$\leq \vzero$. To see this, first notice that the top row is equal to 
+$-\vc^T + \vc_B^TB^{-1}\vA = -\vc^T + \by^T\vA$. (You can verify this 
+easily, by just reasoning through the values that are on the top row). Thus,
+the top row is actually the \textit{negative dual slack}
+$\vc^T - \by^T\vA$. If this slack is $\geq \vzero$, then $\by$ is feasible.
+Thus if the top row of the tableau is $\leq \vzero$, then $\by$ is 
+feasible in DP.
+
+\textit{Note: this also gives us a second way to think about the top row - it is 
+both the rate of change of the ofv as you vary the non-basic variables, and it
+is the negative of the dual slack.}
+
+This gives us 2 paradigms to operate in when solving an LP.
+\begin{enumerate}
+	\item
+		If we have a basic tableau which is primal feasible, but not dual 
+		feasible, then we can use the primal simplex method to move towards
+		a basis which has dual feasibility, while maintaining primal 
+		feasibility.
+	\item
+		If we have a basic tableau which is dual feasible, but not primal
+		feasible, then we can use the \textbf{dual simplex method} to move
+		towards a basis that is primal feasible, while maintaining dual 
+		feasibility.
+\end{enumerate}
+
+\subsubsection{Dual Simplex Method}
+
+The \textit{dual simplex method} (Algorithm~\ref{alg:dual-simplex-method}) is very similar to the primal simplex method.
+Given any basic dual feasible tableau ($-\hat{\vc}^T \leq \vzero$)
+\begin{frml}
+BDFT =	\mat{1 & | & -\hat{\vc}^T & | & \hat{z} \\
+	\vzero & | & \hat{\vA} & | & \hat{\vb} }
+\end{frml}
+
+\begin{algorithm}\label{alg:dual-simplex-method}
+\caption{The Dual Simplex Method}
+	\KwIn{$InitBDFT$}
+	\KwOut{The optmal bfs, $\bx$}
+	$CurrBDFT \leftarrow InitBDFT$\;
+	\While{$\hat \vb$ is not $\geq\vzero$}{
+		$i^* \leftarrow $ some row $i \st \hat\vb_i < 0$ \;
+		\If{Row $i^*$ of $\hat A,\;\;\hat A_{:,i^*} \geq 0$}{
+			The the LP is infeasible.$^{\diamondsuit}$ Exit\;
+		}
+		$j^* \leftarrow \argmin_{j \in \hat A_{i^*,j} < 0} 
+		\frac{- \hat \vc_j}{\hat A_{i^*,j}}$, (i.e. pick from the columns, $j$, 
+		whose value $\hat A_{i^*,j}$ is negative)\;
+		$CurrBDFT \leftarrow $ Pivot on $(i^*, j^*)$ (similar to simplex method),
+		to obtain a new basic dual feasible tableau with an identity column in
+		column $j^*$\;
+	}
+\end{algorithm}
+
+$\diamondsuit$ : Recall that $\hat\vb_{i^*} < 0$. However, if $\hat A_{:,i^*} \geq 0$
+then $\vb$  \textit{cannot} be $< 0$. Thus the problem is not feasible.
+
+

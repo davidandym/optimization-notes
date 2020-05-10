@@ -1,0 +1,174 @@
+\subsection{The Lagrangian Dual}
+
+Now, let's take a look at what the \textit{dual} form of this looks like, where I
+get to pick $\lambda$ first:
+We can define a similar function as before:
+\begin{defn}{Lagrangian $\Theta$-function and Lagrangian Dual Problem}{}
+Where, $\forall \lambda \in \reals^m_{\geq 0}$ we define:
+\begin{frml}
+\Theta(\lambda) = \inf_{\vx \in S} \mathcal{L}(\vx, \lambda)
+\end{frml}
+and we define the Lagrangian dual problem (DP):
+\begin{frml}
+	\sup_{\lambda\in\reals^m_{\geq 0}} \Theta(\lambda) = \sup_{\lambda \in\reals^m_{\geq 0}} \inf_{\vx} \mathcal{L}(\vx, \lambda)
+\end{frml}
+\end{defn}
+
+\begin{theo}{Weak Duality}{}
+	If $\vx_*$ feasible in P, $\lambda_*$ feasible in DP, then 
+	$\textbf{ofv}_{DP}(\lambda_*) \leq \textbf{ofv}_{LP} (\vx_*)$
+\end{theo}
+
+\begin{proof}[]
+	Notice that
+	\begin{frml}
+	\Theta(\lambda_*) = \inf_{x \in S} \mathcal{L}(\vx, \lambda_*) \leq \mathcal{L}(\vx_*, \lambda_*)
+	\leq \sup_{\lambda\in\reals^m_{\geq 0}} \mathcal{L}(\vx_*, \lambda) = \Phi(\vx_*)
+	\end{frml}
+
+	We can see by similar arguments as we used in the game theory arguments earlier.
+	In essence, $\mathcal{L}(\vx_*, \lambda_*)$ is a value which has a fixed
+	$\vx_*$ and a fixed $\vlambda_*$ (\textit{neither of which is necessarily optimal}). 
+	This is obviously less than or greater than
+	the $\sup$ or $\inf$ if we allow the problem to consider \textit{all} $\lambda \in \reals^m_{\geq 0}$ or
+	\textit{all} $\vx \in S$ or 
+\end{proof}
+
+\begin{theo}{Supervisor Principle}{}
+	If $\vx_*$ feasible in P, $\lambda_*$ feasible in DP
+	$\st \textbf{ofv}_{DP}(\lambda_*) = \textbf{ofv}_{P}(\vx_*)$ then
+	$\vx_*$ optimal in P and $\lambda_*$ optimal in DP.
+\end{theo}
+
+For classes of problems where this happens, we say there is \textit{no duality-gap}.
+If we have strict inequality ($<$) then we say that there\textit{ is a duality-gap}.
+
+\subsection{Example: Linear Pogram}
+
+Let's look at an example where this duality can occur: 
+Suppose $A \in \reals^{m\times n}, \vb \in \reals^m,
+\vc \in \reals^n$ such that:
+\begin{frml}
+	P: \min \vc^T\vx \st A\vx\geq \vb, \vx \geq \vzero
+\end{frml}
+
+\subsubsection{A slightly unfair formulation}
+
+We want to compute the Lagrangian dual. We can phrase this as 
+$\vb - A\vx \leq \vzero = \vg(\vx)$ and $\vx \geq \vzero = \vx \in S$.
+
+\textit{This is actually \textit{not a fair translation} of the problem, since we
+are packing some of our restrictions (some $\vg$ functions) into
+restrictions on $S$ instead (making it a closed set). 
+There is a better way to do this, which we'll see in a second.}
+
+We now have the Lagrangian function: 
+\begin{frml}
+\forall \vx \geq \vzero, \lambda \in \reals^m_{\geq 0}, \;\;
+	\mathcal{L}(\vx, \lambda) &= \vc^T\vx + \lambda^T(\vb - A\vx) \\
+							   &= \lambda^T\vb + (\vc^T - \lambda^TA)\vx
+\end{frml}
+
+What does the dual problem look like for this Lagrangian? Remember in the dual problem,
+I am choosing lambdas and trying to \textit{maximize} the overall function value $\sup \Theta(\lambda)$.
+Since $\lambda \geq \vzero$, let's see what our options are for $\lambda$
+\begin{itemize}
+	\item if $\lambda^TA \leq \vc^T$ then $(\vc^T - \lambda^TA) \geq \vzero$, and since $\vx \geq \vzero$, then
+		$\Theta(\lambda) = \inf_{\vx \geq \vzero} \mathcal{L}(\vx, \lambda) = \lambda^T\vb$ since \textit{you}
+		will always choose $\vx = \vzero$ to minimize the function value.
+	\item if $\lambda^TA \not \leq \vc^T$ then $(\vc^T - \lambda^TA) \not \leq \vzero$ and
+		now you can choose some component of $\vx$ to be $\infty$ which will make the
+		whole value of the function go to $-\infty$. 
+		So, $\Theta(\lambda) = \inf_{\vx \geq \vzero} \mathcal{L}(\vx, \lambda) = -\infty$
+\end{itemize}
+So, essentially, the dual of the Lagrangian can be re-written as:
+\begin{frml}
+	\sup_{\vlambda \geq \vzero} \Theta(\vlambda) = \max \vlambda^T\vb \st &\vlambda^TA \leq \vc,\; \vlambda \geq \vzero
+\end{frml}
+which is \textit{exactly} the Dual Formulation of the original P (a linear program).
+
+\subsubsection{A slightly cleaner formulation}
+
+Now, let's write this our more fairly.
+\begin{frml}
+	P: \min \vc^T\vx \st &\mat{\vb \\ \vzero} + \mat{-A \\ -I}\vx \leq \vzero,
+							\vx \in \reals^n
+\end{frml}
+
+Now, our $S$ is an open set ($\reals^n$) and all of our constraints are packed into
+the $\vg$ function, and this is a nicer way to write this out.
+
+To write out the Lagrangian now, let's write out our variables as $\lambda = \mat{\vy \in \reals^m \\ \vz \in \reals^n}$
+and now our Lagrangian looks like,
+$\forall \vx \in \reals, \vy \in \reals^m \geq \vzero, \vz \in \reals^n \geq \vzero$:
+
+\begin{frml}
+\mathcal{L}(\vx, \lambda) = \vc^T\vx + \lambda^T \bigg( \mat{\vb \\ \vzero} + \mat{-A \\ -I}\vx \bigg)
+= \vc^T\vx + \vy^T(\vb - A\vx) + \vz^T(-\vx) = \vy^T\vb + (\vc^T - \vy^TA - \vz^T)\vx
+\end{frml}
+
+As above,let's break up our possible lambda values:
+\begin{itemize}
+	\item if $\vc^T - \vy^TA - \vz = \vzero$ then $\Theta(\vlambda) = \inf_{\vx \in \reals} \mathcal{L}(\vx, \vlambda) = \vy^T\vb$
+	\item if $\vc^T - \vy^TA - \vz \neq \vzero$ then  $\Theta(\vlambda) = \inf_{\vx \in \reals} \mathcal{L}(\vx, \vlambda) = -\infty$ 
+		\textit{(remember in this case $\vx$ is not restricted to be positive).}
+\end{itemize}
+And so the dual ultimately looks like
+\begin{frml}
+	\max \vb^T\vy \st \vc^T - \vy^TA = \vz, \; \vy,\vz \geq \vzero
+\end{frml}
+which we can simplify, since, in this formulation, $\vz$ only appears once and is only
+restricted to be positive, as:
+\begin{frml}
+	\max \vb^T\vy \st \vc^T - \vy^TA \geq \vzero, \; \vy \geq \vzero
+\end{frml}
+which we \textit{finally} can simplify one more time to look like:
+\begin{frml}
+	\max \vb^T\vy \st A^T\vy \leq \vc, \; \vy \geq \vzero
+\end{frml}
+which is a very comfortable form of the dual of the LP :) 
+
+So we've seen that
+converting our linear programming problem into it's Lagrangian form and solving the Lagrangian dual
+is the same as solving the dual of the LP.
+
+\subsection{Example: A quadratic program}
+
+Let's look at another example:
+Suppose $A \in \reals^{n\times n}$ sym. PD, $\vb \in \reals^n$ non-zero, $\vc \in \reals_{> 0}$ and
+\begin{frml}
+	P: \min \frac{1}{2}\vx^TA\vx \st \vb^T\vx + \vc \leq \vzero
+\end{frml}
+and we want to compute and solve the dual.
+Well, the lagrangian looks like
+\begin{frml}
+	\forall \vx \in \reals^n, \lambda \geq \vzero, \; \mathcal{L}(\vx, \lambda)
+	= \frac{1}{2}\vx^TA\vx + \lambda(\vb^T\vx + c)
+\end{frml}
+Now, note that 
+\begin{frml}
+	\Theta(\lambda) = \inf_{\vx \in \reals^n} \frac{1}{2}\vx^TA\vx + \lambda(\vb^T\vx + c)
+\end{frml}
+
+this function is actually convex with respect to $\vx$. So once we pass in a
+given $\lambda$, the minimization will just solve for the $\vx$ which is a global
+min of that function. And, since $A$ is invertible (it's PD) that means that we can
+directly solve for it numerically. For a given $\lambda$, the $\vx$ that minimizes
+the langrangian is given as $\vx = -\lambda A^{-1}\vb$
+
+We can just plug this into our original $\Theta$ function, then, to get
+\begin{frml}
+	\Theta(\lambda) &= \frac{1}{2}(-\lambda A^{-1}\vb)^TA(-\lambda A^{-1}\vb) + 
+\lambda(\vb^T(-\lambda A^{-1}\vb) + c) \\
+					 &= \frac{\lambda^2}{2}\vb^TA^{-1}\vb - \lambda^2\vb^TA^{-1}\vb + \lambda c
+\end{frml}
+and thus the (DP) looks like
+\begin{frml}
+	\sup_{\lambda \geq 0} \frac{-\lambda^2}{2}\vb^TA^{-1}\vb + \lambda c
+\end{frml}
+
+if we set the derivative $-\lambda \vb^TA^{-1}\vb + c = 0 \rarrw \lambda = \frac{c}{\vb^TA^{-1}\vb} > 0$
+which is a unique global max, making the \textbf{ofv} to be $\frac{c^2}{2\vb^TA^{-1}\vb}$.
+So, in this case, we have used the Lagrangian dual to exactly solve our
+system! It's a pretty powerful tool!
+

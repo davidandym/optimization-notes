@@ -1,0 +1,206 @@
+%pdflatex
+\documentclass[13pt, letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{parskip} % no indents, and nice spacing
+\usepackage[margin=0.7in]{geometry} % margines
+
+\usepackage[bitstream-charter,cal=cmcal]{mathdesign}
+
+\usepackage{color}
+\usepackage{graphicx}
+
+\usepackage{hyperref}
+
+\usepackage{amsmath}
+\usepackage{listings} % -> also see the haskell template!
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+\usepackage{mathtools} % mathclap
+
+
+\usepackage{stmaryrd} % semantics brackets \llbracket \rrbracket
+
+\usepackage{tikz}
+\usetikzlibrary{matrix}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+% \usetikzlibrary{arrows.meta}
+% \usetikzlibrary{decorations.pathreplacing}
+% \usetikzlibrary{fit}
+% \usetikzlibrary{trees}
+
+% pgfplots
+% \usepackage{pgfplots}
+% \pgfplotsset{compat=newest}
+
+% algorithms
+% \usepackage{algorithm} % the environment
+% \usepackage{algpseudocode} % algorithmicx package: algorithms themselves
+
+% "Beautiful" (i.e. sufficient) headers and footers
+% \usepackage[automark,headsepline]{scrlayer-scrpage}
+
+% \pagestyle{scrheadings}
+% \clearscrheadfoot
+% \automark[chapter]{section}
+% \ohead{\pagemark}
+% % \chead{David Mueller (\texttt{dam@jhu.edu}), On Cognition}
+% \textheight=22cm
+
+% Page number at bottom only for new chapter page
+% \deftripstyle{ChapterStyle}{}{}{}{}{\pagemark}{}
+% \renewcommand*{\chapterpagestyle}{ChapterStyle}
+
+\usepackage{amsthm} % Actual theorem package.
+\usepackage{thmtools} % Provides a nice frontend for (for example) amsthm.
+\usepackage{centernot}
+\usepackage[]{mdframed}
+\usepackage[vlined,ruled]{algorithm2e}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{theorems}
+\usepackage{cleveref}
+\newtcbtheorem[no counter]
+{defn}{Definition}{%                                                        
+  breakable,
+  fonttitle = \bfseries,
+  colframe = gray!50!black,
+  colback = blue!0
+}{defn}
+
+\newtcbtheorem[auto counter, number within = section]
+{theo}{Theorem}{%                                                        
+  breakable,
+  fonttitle = \bfseries,
+  colframe = red!55!black,
+  colback = red!5
+}{theo}
+
+\newtcbtheorem[auto counter, number within = section]
+{coro}{Corollary}{%                                                        
+  breakable,
+  fonttitle = \bfseries,
+  colframe = red!55!black,
+  colback = red!5
+%  colframe = blue!75!black,
+%  colback = blue!10
+}{coro}
+
+\newtcbtheorem[auto counter, number within = section]
+{prop}{Proposition}{%                                                        
+  breakable,
+  fonttitle = \bfseries,
+  colframe = red!55!black,
+  colback = red!5
+}{prop}
+
+\crefname{defn}{definition}{Definition}
+\Crefname{defn}{Definition}{Definition}
+
+\theoremstyle{definition}
+\declaretheorem[qed=$\Box$, name=Example, refname={Ex.,Exs.},numbered=no]{example}
+\declaretheorem[qed=$\blacksquare$, name=Observation, refname={Obs.},numbered=no]{observation}
+\declaretheorem[name=Theorem, refname={Thm.,Thms.},numbered=no]{theorem}
+\declaretheorem[name=Proposition, refname={Prop.,Props.},numbered=no]{proposition}
+\declaretheorem[name=Lemma, refname={Lem.,Lems.},numbered=no]{lemma}
+\declaretheorem[name=Claim, refname={Cl.,Cls.},numbered=no]{claim}
+
+% \theoremstyle{proof}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+\newenvironment{supplementalproof}[1]{\begin{proof}[Supplemental to the proof of \cref{#1}]}{\end{proof}}
+
+\definecolor{gray}{gray}{0.7}
+
+\newcommand{\todo}[1]{
+  {\colorbox{gray}{\begin{minipage}{\textwidth}\bfseries #1\end{minipage}}}
+}
+
+\newcommand{\inlinetodo}[1]{\textcolor{red}{#1}}
+
+\newcommand{\new}[1]{\emph{#1}}
+
+\newcommand{\mathtext}[1]{\;\text{#1}\;}
+
+\renewcommand*{\mathellipsis}{%
+  \mathinner{{\ldotp}{\ldotp}{\ldotp}}%
+}
+
+\newcommand{\vx}{\mathbf{x}}
+\newcommand{\vr}{\mathbf{r}}
+\newcommand{\bx}{\bar{\vx}}
+\newcommand{\bla}{\bar{\lambda}}
+\newcommand{\by}{\bar{\vy}}
+\newcommand{\bz}{\bar{\vz}}
+\newcommand{\vy}{\mathbf{y}}
+\newcommand{\vw}{\mathbf{w}}
+\newcommand{\vp}{\mathbf{p}}
+\newcommand{\vq}{\mathbf{q}}
+\newcommand{\vb}{\mathbf{b}}
+\newcommand{\vc}{\mathbf{c}}
+\newcommand{\vg}{\mathbf{g}}
+\newcommand{\vd}{\mathbf{d}}
+\newcommand{\vu}{\mathbf{u}}
+\newcommand{\vv}{\mathbf{v}}
+\newcommand{\vz}{\mathbf{z}}
+\newcommand{\vlambda}{\overrightarrow{\lambda}}
+\newcommand{\rarrw}{\rightarrow}
+\newcommand{\vA}{A}
+\newcommand{\st}{\;\; \text{s.t.} \;\;}
+\newcommand{\Fg}{g_{\bar{\vx}, \vd}}
+\newcommand{\vzero}{\mathbf{0}}
+\newcommand{\vone}{\mathbf{1}}
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\notimplies}{\centernot \implies}
+\newcommand{\mat}[1]{\begin{bmatrix} #1 \end{bmatrix}}
+\newcommand{\dir}[2]{\frac{\delta #1}{\delta #2}}
+\newcommand{\secdir}[3]{\frac{\delta^2 #1}{\delta #2 \delta #3}}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newenvironment{frml}{\begin{equation*}\begin{aligned}}{\end{aligned}\end{equation*}}
+
+% \usepackage{hyperref}
+% \hypersetup{
+%   pdfauthor={David Mueller},
+%   pdftitle={Cognition},
+%   breaklinks=true, colorlinks=false, pdfborder={0 0 0}
+% }
+
+\usepackage{enumerate}
+\usepackage{float}
+
+
+\title{Non-Linear Optimization 553.762}
+\author{Class Website: \url{http://www.ams.jhu.edu/~fishkind/553_762.html} \\ Notes by David Mueller}
+\date{}
+\begin{document}
+\maketitle
+\tableofcontents
+
+\input{sections/day01.tex}
+\input{sections/day02.tex}
+\input{sections/day03.tex}
+\input{sections/day04.tex}
+\input{sections/day05.tex}
+\input{sections/day06.tex}
+\input{sections/day07.tex}
+\input{sections/day08.tex}
+\input{sections/video_day01.tex}
+\input{sections/day09.tex}
+\input{sections/day10.tex}
+\input{sections/day11.tex}
+\input{sections/video_day03.tex}
+\input{sections/video_day04.tex}
+\input{sections/video_day05.tex}
+\input{sections/video_day06.tex}
+\input{sections/video_day07.tex}
+\input{sections/video_day08.tex}
+\input{sections/video_day09.tex}
+\input{sections/video_day10.tex}
+\input{sections/video_day11.tex}
+
+\end{document}

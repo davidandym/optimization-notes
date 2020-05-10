@@ -1,0 +1,193 @@
+
+\textit{Note that ``pure-strategy'' games are a particular instance of mixed strategies,
+e.g. we can only assign probabilities $1$ and $0$ to rows or columns.}
+
+The 2 possible games that can be played are:
+\begin{itemize}
+	\item ``me-first'': $\max_\vp \min_\vq E_M(\vp, \vq)$
+		- 
+		In this problem, I have the much more complicated problem. Your job
+		is easy here. Once you have my $\vp$, then all you have to do is pick a
+		$\vq$ which minimizes the expected value. But I have to work really hard,
+		because I have to consider \textit{what you'll pick} as I pick my $\vp$.
+	\item ``you-first'': $\min_\vq \max_\vp E_M(\vp, \vq)$
+		- 
+		Here, we have the opposite problem. Now, \textit{your} job is the hard
+		one, because you have to consider what I will do after you pick.
+\end{itemize}
+
+\subsubsection{Second Player Strategy}
+
+Let's look at the example from above:
+\begin{frml}
+	M = \mat{10 & -1 & 2 & -9 \\ 3 & 6 & -2 & 0 \\ -3 & 7 & 5 & 8}
+\end{frml}
+In ``me-first'', if I pick $\vp = \mat{.1 \\ .2 \\ .7}$, what would your $\vq$ be?
+
+\begin{frml}
+	E_M(\mat{.1 \\ .2 \\ .7}, \vq) &= 
+	\vq_1\bigg((.1)10 + .2(3) + .7(-3)\bigg)
+	+ \vq_2\bigg((.1)-1 + .2(6) + .7(7)\bigg) \\
+	& + \vq_3\bigg((.1)2 + .2(-2) + .7(5)\bigg)
+	+ \vq_4\bigg((.1)-9 + .2(0) + .7(8)\bigg) \\
+	&= \vq_1(-.5) + \vq_2(6) + \vq_3(3.3) + \vq_4(4.7)
+\end{frml}
+
+So... if you want to minimize the equation what will you pick? You should just
+put all of your eggs in one basket! Ie., you should choose $\vq = \mat{1 & 0 & 0 & 0}$!
+This obviously minimizes the expected value.
+
+\begin{prop}{}{}
+In mixed-strategy matrix games, the second player can \textit{always} have an 
+optimal strategy that is ``pure''.  e.g.,
+\begin{frml}
+	\text{In ``me-first'': } \max_\vp \min_\vq E_M(\vp, \vq) &=
+	\max_\vp \min_j \sum_i \vp_i M_{i,j} \\
+	\text{In ``you-first'': } \min_\vp \max_\vp E_M(\vp, \vq) &=
+	\min_\vq \max_i \sum_j \vq_j M_{i,j}
+\end{frml}
+\end{prop}
+
+\subsubsection{First-player strategy}
+
+We've seen that the second-player's strategy is relatively trivial. However,
+how does the first-player go about picking their vector? Well, it turns out
+that, for example in ``me-first'', my strategy is the linear program:
+\begin{frml}
+	\max z \st & \forall j, \; \sum_i p_i m_{i,j} \geq z,\\
+		& \forall i,\; p_i \geq 0, \\
+		& \sum_i p_i = 1 \\
+\end{frml}
+with variables $\vp, z$. What's going on here? The last two constraints are just
+making sure that we keep $\vp$ to be a valid probability distribution. The top line
+is where the real magic is happening. Notice that, in this formalization,
+$z$ is a value which is below the weighted sum of each column, where the weights
+are our variables $\vp$. Since $z$ is forced to be below each column-sum, when
+we maximize $z$ we are pushing up the minimum value of the column-sums. Remember that
+when ``you'' are picking your $\vq$ in this game, you will be picking the column
+with the minimum column-sum, weighted by my $\vp$. So my goal is to find a $\vp$
+which maximizes $z$, the minimum column-sum value!
+So, we've sort of ``built-in'' your decision with $z$ and our desire to maximize
+it, and now all that's left is to find a $\vp$ which maximizes $z$. And this
+is a linear-programming problem!
+
+Let's rewrite this into a concise matrix form:
+\begin{frml}
+	\max \mat{\vzero \\ 1}^T\mat{\vp \\ z} \st & \mat{M^T & -\vone \\ \vone^T & 0} 
+	\mat{\vp \\ z}
+	\mat{\geq \vzero \\ = 1},\\
+& \mat{\vp \\ z} \mat{ \geq \vzero \\ \text{\textit{unrestricted}}}
+\end{frml}
+
+Let's break this down a bit. The top row of our constrants is saying that 
+$M^T\vp \geq z\vone$, which is exactly our earlier contraints. It's just
+assuring us that our weighted column-sum is greater than $z$. The bottom row
+just just assuring us that $\vp$ sums to one. And the second constraint is
+just making sure that our $\vp$ is also not negative, but we have \textit{
+no constraint} on $z$.
+
+Let's write out the dual of this problem:
+\begin{frml}
+	\min \mat{\vzero \\ 1}\mat{-\vq \\ w} \st & \mat{M & \vone \\ -\vone^T & 0}
+	\mat{-\vq \\ w}\mat{\geq \vzero \\ = 1} \\
+& \mat{-\vq \\ w}\mat{\leq \vzero \\ \text{\textit{unrestricted}}}
+\end{frml}
+
+\textit{Here we're just deciding to name our dual variable $-\vq$ as opposed to $\vq$ for
+naming convention. So think of $-\vq$ as our regular dual variable}. 
+
+Let's rephrase this (decompose it a little and switch the inequalities with our negative).
+\begin{frml}
+	\min w \st & \forall i, \; \sum_j \vq_j M_{i,j} \leq w, \\
+			   & \sum_j \vq_j = 1, \\
+			   & \forall j, \; \vq_j \geq \vzero
+\end{frml}
+
+and... of course, this is \textit{exactly} the ``you-first'' strategy!
+So my best strategy in the me-first and your best strategy in the you-first
+are dual problems! And what we have, given strong duality, is that these two
+problems have equal optimal objective function values since they're both
+feasible. So \textit{it actually doesn't matter who goes first!} By strong
+duality, both games have the same value.
+
+More formally:
+
+\begin{theo}{}{}
+In mixed-strategy matrix games:
+\begin{frml}
+	\max_\vp \min_\vq E_M(\vp, \vq) = \min_\vq \max_\vp E_M(\vp, \vq)
+\end{frml}
+\end{theo}
+
+\begin{proof}[]
+By strong-duality!
+\end{proof}
+
+\pagebreak
+\section{Lagrangian Duality}
+
+Now we shift from Matrix Games to a \textit{very related} concept, the Lagrangian
+problem. We will see the notion of saddle-points from matrix game theory
+comes into play in this optimization problem, and then how it also
+ties into our KKT conditions.
+
+\subsection{The Lagrangian Function}
+
+\begin{defn}{The Lagrangian Function}{}
+Consider the problem P:
+\begin{frml}
+	\min f(\vx) \st & \vg(\vx) \leq \vzero \\
+						  & \vx \in S \\
+						  & S \subseteq \reals^n, \; f, \vg_1, \vg_2, \ldots \vg_m : S \rarrw \reals
+\end{frml}
+
+Then, we define the \textbf{Lagrangian function} of P to be:
+\begin{frml}
+	\mathcal{L}(\vx, \lambda) & = f(\vx) + \lambda^T\vg(\vx) 
+							\\ & = f(\vx) + 
+	\sum_{i = 1}^m \lambda_i \vg_i(\vx)
+\end{frml}
+defined for all $\vx \in S, \lambda \in \reals^m_{\geq 0}$. 
+\end{defn}
+
+\textit{In essence,
+we've sort of relocated our $\vg$ into our objective function, and included 
+these things called lagrangian
+multipliers ($\lambda$ ) into it.}
+
+\begin{defn}{Lagrangian $\Phi$-function}{}
+$\forall \vx \in S$, define
+	\begin{frml}
+\Phi(\vx) = \sup_{\lambda \in \reals^m_{\geq 0}} \mathcal{L}(\vx, \lambda)
+	\end{frml}
+\end{defn}
+
+\begin{prop}{}{}
+$P$ is equivalent to 
+\begin{frml}
+	\inf_{\vx \in S} \Phi(\vx) = 
+	\inf_{\vx \in S} \; \sup_{\vlambda \in \reals^m_{\geq 0}} \mathcal{L}(\vx, \vlambda)
+\end{frml}
+\end{prop}
+
+\textit{We can think about matrix games here: You are picking an $\vx$ that tries to
+minimize this value, and I'm picking $\lambda$ which then maximizes the value.
+We've used $\Phi$ to sort of abstract ``me'' away from the equation, in other
+words I'm kind of like a black-box in this scenario, and you're picking
+$\vx$ first.}
+
+\begin{proof}[]
+For any $\vx \in S$, if $\vg(\vx) \leq \vzero$ then 
+$\mathcal{L}(\vx, \lambda) = f(\vx) + \lambda^T\vg(\vx) \leq f(\vx)$, so
+$\Phi(\vx) = f(\vx)$, since I will always set $\lambda = \vzero$ in order
+to maximize the equation.
+
+If $\vg(\vx) \not \leq \vzero$, say $\vg_i(\vx) > 0$, then I will set $\lambda_i =
+\infty$, which will make
+$\mathcal{L}(\vx, \lambda) \rarrw \infty$, so $\Phi(\vx) = \infty$.
+
+Thus, $\inf_{\vx \in S} \Phi(\vx) = P$, since \textit{you} will never ever choose an
+$\vx$ which is not ``feasible'' by our original $\vg$ restrictions. Thus, we
+are basically still doing the same - you're trying to find an $\vx$ which minimizes
+$f(\vx)$ but satisfies the constraints $\vg(\vx)$. They're equivalent problems!
+\end{proof}

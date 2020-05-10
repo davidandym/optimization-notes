@@ -1,0 +1,239 @@
+\pagebreak
+\section{The Dual of Linear Programs}
+
+We have seen Linear Programs and how to solve them. Now we will look at the
+\textit{dual problem} of a Linear Program.
+
+\begin{defn}{Dual of the Canonical Form}{}
+Let $\vA \in \reals^{m \times n}, \; \vb \in \reals^m, \; \vc \in \reals^n$.
+A linear program in canonical form is of the form:
+		\begin{frml}
+			\min \vc^T\vx \st &\vA\vx\geq\vb, \\ &\vx \geq \vzero
+		\end{frml}
+
+Then the \textbf{dual problem}, DP, takes the form:
+\begin{frml}
+\max \vb^T\vy \st &\vA^T\vy \leq \vc, \\ &\vy \geq \vzero
+\end{frml}
+\end{defn}
+
+\begin{defn}{Dual of the Standard Form}{}
+Let $\vA \in \reals^{m \times n}, \; \vb \in \reals^m, \; \vc \in \reals^n$.
+A linear program in standard form is of the form:
+\begin{frml}
+\min \vc^T\vx \st &\vA\vx=\vb, \\ &\vx \geq \vzero
+\end{frml}
+
+Then the \textbf{dual problem}, DP, takes the form:
+\begin{frml}
+\max \vb^T\vy \st \vA^T\vy \leq \vc
+\end{frml}
+\end{defn}
+
+\subsubsection{Equality across forms}
+
+As before, with the primary Linear Programming formulation, the 2 forms 
+(canonical and dual) are equivalent to each other.
+
+
+Suppose we have a linear program, LP, in \textit{canonical form}:
+\begin{frml}
+	\min \vc^T\vx, \st &\vA\vx \geq \vb, \\ &\vx \geq \vzero \\
+\end{frml}
+It can be converted into a \textit{standard form LP}: 
+\begin{frml}
+	\min \mat{\vc \\ \vzero} \mat{\vx \\ \vz}, \st &\mat{\vA & | & -I}
+	\mat{\vx \\ \vz} = \vb, \\ &\mat{\vx \\ \vz} \geq \vzero \\
+\end{frml}
+With \textit{standard form} dual problem, DP: 
+\begin{frml}
+	\max \vb^T\vy \st \mat{\vA^T \\ -I}\vy \leq \mat{\vc \\ \vzero} \\
+\end{frml}
+Which is exactly the following DP in \textit{canonical form}:
+\begin{frml}
+	\max \vb^T\vy \st &\vA^T\vy \leq \vc, \\ &\vy \geq \vzero
+\end{frml}
+
+The other direction is similar: 
+Suppose we are given a linear program, LP, in \textit{standard form}:
+\begin{frml}
+	\min \vc^T\vx \st \vA\vx = \vb, \; \vx \geq \vzero
+\end{frml}
+The \textit{canonical form} of this LP is:
+\begin{frml}
+	\min \vc^T\vx \st &\mat{\vA \\ -\vA}\vx \geq \mat{\vb \\ -\vb}, \\ &\vx 
+	\geq \vzero \\
+\end{frml}
+The dual of this problem is:
+\begin{frml}
+	\max \mat{\vb \\ -\vb}^T \mat{\vu \\ \vv} \st &\mat{\vA^T & | -\vA^T}
+	\mat{\vu \\ \vv} \leq \vc, \\ &\mat{\vu \\ \vv} \geq \vzero \\
+\end{frml}
+Which can be converted into \textit{standard dual form} as:
+\begin{frml}
+	\max \vb^T(\vu - \vv) \st &\vA^T(\vu - \vv) \leq \vc, \\ &\mat{\vu \\ \vv}
+	\geq \vzero 
+\end{frml}
+We can simplify this by setting $\vz = (\vu - \vv)$:
+
+\textit{Note: that the non-negativity
+constraints disappear for  $\vz$ because it is the difference of two  
+non-negative vectors}
+\begin{frml}
+	\max \vb^T\vz \st &\vA^T\vz \leq \vc
+\end{frml}
+
+
+\subsubsection{The dual of the dual}
+
+Lastly, note that we can show the dual of the dual is the primal:
+\begin{frml}
+	(LP): &\min \vc^T\vx, \; \st \vA\vx \geq \vb, \; \vx \geq \vzero &\rarrw \\
+	(Dual): &\max \vb^T\vy, \st \vA^T\vy \leq \vc, \; \vy \geq \vzero &\rarrw \\
+	(Equivalently):&\min -\vb^T\vy \st -\vA^T\vy \geq -\vc, \; \vy \geq \vzero &\rarrw \\
+	(Dual): &\max -\vc^T\vz \st [-\vA^T]^T\vz \geq -\vb, \; \vz \geq \vzero &\rarrw \\
+	(Resolving): &\min \vc^T\vz \st \vA\vz \geq \vb. \; \vz \geq \vzero
+\end{frml}
+The last term here is exactly our original LP.
+
+
+\subsection{Duality}
+
+\begin{theo}{Weak Duality}{}
+Let LP be a lienar program, with a dual DP.	
+
+\medskip
+If $\bx$ feasible in LP, and $\by$ feasible
+in DP, then $$\textbf{ofv}_{DP}(\by) \leq \textbf{ofv}_{LP}(\bx)$$
+\end{theo}
+
+\begin{proof}[Weak Duality (standard form)]
+	\[\vb^T\by = (\vA\bx)^T\by = 
+	\bx^T\vA^T\by \leq \bx^T\vc = \vc^T\bx\]
+		The inequality holds by the feasability of $\by$ in the dual, which 
+		states that $\vA^T\vy \leq \vc$.
+\end{proof}
+
+\begin{proof}[Weak Duality (canonical form)]
+	\[\vb^T\by \leq (\vA\bx)^T\vy = 
+	\bx^T\vA^T\by \leq \bx^T\vc = \vc^T\bx\]
+\end{proof}
+
+\begin{theo}{Supervisor Principle}{}
+Let LP be a lienar program, with a dual DP.	
+
+\medskip
+If $\bx$ feasible in LP, $\by$ feasible
+in DP, and \[\textbf{ofv}_{DP} (\by) = \textbf{ofv}_{LP} (\bx)\] then $\bx$ and $\by$
+are optimal in their respective problems.
+\end{theo}
+
+\begin{proof}[]
+By weak duality.
+\end{proof}
+
+\begin{theo}{Strong Duality}{}
+Let LP be a linear program.
+
+\medskip
+If LP is feasible, and the objective 
+function value is lower bounded then:
+\begin{itemize}
+	\item The LP has a solution $\bx$
+	\item The DP has a solution $\by$
+	\item $\textbf{ofv}_{DP}(\by)=\textbf{ofv}_{LP}(\bx)$.
+\end{itemize}
+\end{theo}
+
+\begin{proof}[]
+Let $\vA \in \reals^{m \times n}$ (WLOG assume it is rank $m$),
+and $\vb \in \reals^m, \; \vc \in \reals^n$. Let LP be a linear program in
+standard form:
+\begin{frml}
+	\min \vc^T\vx \st &\vA^T\vx = \vb, \\ &\vx \geq \vzero
+\end{frml}
+Assume that LP has been solved to optimality with the simplex method, with the
+optimal bfs $\bx$ as the solution, and basis
+$B$, implying
+$A = \mat{B & | & N}$.
+By optimality, $\vr_N^T = \vc_N^T - \vc_B^TB^{-1}N \geq \vzero$.
+The dual formulation of this problem is:
+\begin{frml}
+	\max \; \vy^T\vb \st &\vy^T\vA \geq \vc^T
+\end{frml}
+Consider $\by^T = \vc_B^TB^{-1}$. Note that 
+$\by^T\vb = (\vc_B^TB^{-1})\vb = \vc_B^T(B^{-1}\vb) = \vc^T\bx$. Thus, if
+$\by$ is feasible, then it has $\textbf{ofv}_{DP}(\by) = \textbf{ofv}_{LP}(\bx)$ 
+and by the Superisor Principle, $\by$ must be optimal.
+If $\by\vA \leq \vc$ then $\by$ is feasible. This holds, because
+\begin{frml}
+	\by^T\vA = \vc_B^TB^{-1}\mat{B & | & N} = \mat{\vc_B^T & | & \vc_B^TB^{-1}N}
+	\leq \mat{\vc_B^T & | & \vc_N^T}
+\end{frml}
+
+\textit{Note: The inequality holds because the reduced cost variables show 
+that $\vc_N^T \geq \vc_B^TB^{-1}N$.}
+
+Thus $\by$ is feasible with \textbf{ofv} equal to $\textbf{ofv}_{LP}(\bx)$ 
+in the primal, and thus is optimal in DP.
+\end{proof}
+
+\subsubsection{Complementary Slackness}
+
+\begin{defn}{Complementarity}{}
+
+\begin{frml}
+	\vx = \mat{63 \\ 0 \\ 0 \\ 9 \\ 0 \\ 2}, \; \vy = \mat{0 \\ 0 \\ 8 \\ 0 \\ 10 \\ 0}
+\end{frml}
+
+are \textbf{complementary}, since the non-zero entries of one correspond to zero
+entries in the other.
+
+If $\vx, \vy \in \reals^n \st \vx, \; \vy \geq \vzero$, then $\vx$ and $\vy$
+are complementary iff $\vx^T\vy = 0$.
+\end{defn}
+
+\begin{theo}{Standard Form Complementary Slackness}{}
+Let LP be a linear program in standard form, with dual problem DP.
+
+\medskip
+If $\bx$ feasible in LP,
+$\by$ feasible in $DP$, then $\bx$ is optimal in the primal, $\by$ is optimal
+in the dual iff $\bx$ is complementary to the dual slack of $\by$, i.e.
+\begin{frml}
+	\bx_{\geq \vzero} \perp (\vc - \vA^T\by)_{\geq \vzero}
+\end{frml}
+\end{theo}
+
+\begin{proof}[]
+As in the weak duality proof, 
+\begin{frml}\vb^T\by = \bx\vA\by \leq \bx^T\vc = \vc^T\bx
+\end{frml}
+Note that $\bx$ is optimal in LP and $\by$ is optimal in DP iff $\vb^T\by = \vc^T\bx$.
+which is true iff the equality $\bx^T\vA\by = \bx^T\vc$ holds, which is true
+iff $\bx^T(\vc - \vA^T\by) = 0$!
+\end{proof}
+
+\begin{theo}{Canonical Form Complementary Slackness}{}
+Let LP be a linear program in canonical form, with dual problem DP.
+
+\medskip
+If $\bx$ feasible
+in LP, $\by$ feasible in DP, $\bx$ is optimal in LP and $\by$ is optimal in DP 
+iff
+$\bx \perp \vc - \vA^T\by$ \textbf{and} $\by \perp \vA\bx - \vb$.
+\end{theo}
+
+\begin{proof}[] 
+\begin{frml}
+	\vb^T\by \leq (\vA\bx)^T\by = \bx^T\vA^T\by \leq \bx^T\vc = \vc^T\bx
+\end{frml}
+Similar to above, we need our inequalities to become equalities, which happens
+exactly when
+\begin{itemize}
+	\item
+		$\vb^T\by = (\vA\bx)^T\vy \rarrw (\vA\bx - \vb)^T\by = 0$, and
+	\item
+		$\bx^T\vA^T\by = \bx^T\vc \rarrw \bx^T(\vc - \vA^T\by) = 0$
+\end{itemize}
+\end{proof}

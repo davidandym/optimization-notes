@@ -1,0 +1,175 @@
+\pagebreak
+\section{Matrix Games}
+
+We're going to shift focus for a few sections to talk about min-max games, and
+Lagrangian duality. This will tie in, in an important way, to our notion 
+of duality in constrained optimization problems.
+
+\subsection{Deterministic Matrix Games}
+
+In a matrix game, we're going to have two players:
+\begin{itemize}
+	\item a row-player, who we'll say is ``me''
+	\item a column-player, who we'll say is ``you''
+\end{itemize}
+
+Here's an example:
+\begin{frml}
+	M = \mat{10 & -1 & 2 & -9 \\ 3 & 6 & -2 & 0 \\ -3 & 7 & 5& 8}
+\end{frml}
+
+The rules of the game are: upon a choice of row and column, \textit{you} give 
+\textit{me} the money equal to the amount in that matrix cell. So I want to
+\textit{maximize} the value, and you want to \textit{minimize} it.
+
+We're going to start with the deterministic case: there's two cases to consider.
+\begin{itemize}
+	\item me first (I pick rows): the problem then looks like $\max_i \min_j M_{i,j}$
+	\item you first (You pick cols): the problem then looks like $\min_j \max_i M_{i,j}$.
+\end{itemize}
+
+In each of these cases, we both know what the other is going to pick given a choice of
+row or column. In other words, I know what you will pick after I pick any column,
+because I know you want to minimize. So, in this case, I will always pick the
+2nd row, which maximizes (out of all possible rows) your choice. Thus, we say
+that the \textit{value} of this game is $-2$ with $\arg(2,3)$.
+
+Now, if you go first, then you will certainly pick the 3rd row... because then
+the maximum choice for me is $5$, and that is the smallest value that you can 
+present to me to pick from. Here, the value of the game is $5$, with $\arg(3,3)$.
+
+\begin{prop}{Weak Duality}{}
+$$\max_i \min_j M_{ij} \leq \min_j \max_i M_{ij}$$ 
+or, in other
+words, \textit{going second is an advantage.}
+\end{prop}
+
+\begin{proof}[]
+Let's say that $(i^*, j^*)$ is the $\arg$ for when I go first 
+($\max_i \min_j M_{i,j}$). Let's say that $(i', j')$ is the $\arg$ for when you go first,
+($\min_j \max_i M_{i,j}$). Then, we have that $M_{i^*, j^*} \leq M_{i^*, j'} 
+	\leq M_{i', j'}$
+
+Why? Notice that $M_{i^*, j^*}$ and $M_{i^*, j'}$ both have $i^*$. Remember, that
+for the game where I went first, I picked $i^*$ \textit{first}, knowing that you
+would pick $j^*$ because it was the min. \textit{So $j'$ can't possibly be better
+or you would have picked it!}. And we can make the same argument in the other
+direction! \textit{You} picked $j'$ first, knowing that I would pick $i'$ to
+\textit{maximize} the value. So $(i^*, j')$ can't be bigger than $(i', j')$
+or, again, \textit{I} would have picked it! 
+\end{proof}
+
+\subsection{Saddle Points}
+
+\begin{defn}{Saddle Point}{}
+A \textbf{saddle point} for $M, (i^*, j^*)$, with value
+$M_{i^*,j^*}$,  is a point such that $$\forall i,j \;\; M_{i, j^*} \leq M_{i^*, j^*}
+\leq M_{i^*, j}$$
+In other words, we're at an equilibrium between the players.
+\end{defn}
+
+An example of this is:
+\begin{frml}
+	M = \mat{20 & 2 & 9 & -1 \\ 11 & 13 & 10 & 12 \\ -6 & -8 & 7 & 15}
+\end{frml}
+
+Here, the saddle point is $(i^*, j^*) = (2, 3)$. Why? Look at the options between
+both players, given this point. If I fix the row to $i^*$, then you don't have any
+better choices than $j^*$ (your other options are 11, 13, or 12, and you want to
+minimize). But the same goes for me... if you fix the column to $j^*$, then I certainly
+don't want to move off of $i^*$.
+
+\begin{prop}{}{}
+For any $M$, if $(i^*, j^*)$ and $(i', j')$ are both saddle
+points, then $(i^*, j')$ and $(i', j^*)$ are also saddle points, and they
+all have the same value.
+\end{prop}
+
+\begin{proof}
+By definition of a saddle point, 
+$\forall i,j \; M_{i,j^*} \leq M_{i^*,j^*} \leq M_{i^*, j}$ and
+$\forall \; i,j M_{i,j'} \leq M_{i',j'} \leq M_{i', j}$.
+Then, 
+\begin{frml}
+	M_{i'j'} \leq M_{i', j^*} \leq M_{i^*, j^*} \leq M_{i^*, j'} \leq M_{i', j'}
+\end{frml}
+This is trivially true, since both $(i', j')$ and $(i^*, j^*)$ are saddle 
+points. This sandwiching technique shows that everything here is equal. Since
+they're all equal, then they are all saddle points (by definition).
+\end{proof}
+
+Now, look at the matrix $M$ with a saddle point above. Play the game
+where you go first, and then play the game where I go first. Notice how, in both
+games, the optimal value for both of us to pick is actually \textit{the saddle
+point}. And in fact... \textbf{This is always the case!}
+
+\begin{theo}{}{}
+For any $M$, $\max_i \min_j M_{i,j} = \min_j \max_i M_{i,j}$
+iff there exists a saddle point, $(i^*, j^*)$.  Furthermore, $(i^*, j^*) \in
+\arg [\max_i \min_j M_{i,j}] \; \& \; \arg [ \min_j  \max_i M_{i,j}]$.
+\medskip\\
+\textit{i.e. if there is a saddle point, then it is the optimal choice for both
+players}.
+\end{theo}
+
+\begin{proof}
+	($\impliedby$) Suppose $M_{i^*, j^*}$ is a saddle point. By definition
+\begin{frml}
+	M_{i^*, j^*} & = \min_j M_{i^*, j} 
+	& \text{  \textit{even if you choose, you will choose $j^*$ because 
+	it's a saddle point}}\\
+	& \leq \max_i \min_j M_{i,j} 
+	& \text{ (1) \textit{If I am free to pick a row now, then I may pick something worse 
+	for you}} \\
+	& \leq \min_j \max_i M_{i,j}  
+	& \text{ (2) \textit{True by our proposition above.}} \\
+	& \leq \max_i M_{i, j^*} & \text{   (3) \textit{Reverse argument of (1)}}\\
+	& = M_{i^*, j^*} & \text{ \textit{Again, because it's a 
+	saddle point. I'll always choose this }}
+\end{frml}
+
+Thus, all of these inequalities are actually equalities. Notice that equality
+in (2) gives us that $\max_i \min_j M_{i, j} = \min_j \max_i M_{i,j}$. Equality
+in (1) says that in the $\max_i \min_j$ problem, picking $i^*$ is the best
+thing I can do. Equality in (3) says that, in the $\min_j \max_i$ problem, $j^*$
+is the best choice you can make. By definition of saddle points, if I choose
+$i^*$ or you choose $j^*$, the final result will be $(i^*, j^*)$.
+
+This shows that, if you have a saddle point, then both games will converge to the
+same point, and that's the best point that either side can pick.
+
+($\implies$) Suppose 
+$(i', j') \in \arg[\max_i \min_j M_{i,j}]$ and that
+$(i'', j'') \in \arg[\min_i \max_j M_{i,j}]$, and further that $M_{i',j'} = 
+M_{i'', j''}$.
+
+Then, 
+\begin{frml}
+	M_{i', j''} \leq M_{i'', j''} = M_{i', j'} \leq M_{i'', j'} \implies 
+M_{i'', j''} = M_{i', j'} = M_{i', j''}
+\end{frml}
+which implies that $M_{i', j''}$ is a saddle point.
+\end{proof}
+
+\subsection{Probabilistic Matrix Games}
+
+In this game, I pick a row probability
+ vector $\vp$, and you will pick a column probability vector $\vq$. We call
+ these games \textit{mixed-strategy} games, where the deterministic case are 
+ called \textit{pure-strategy} games.
+
+For example, let's say we have a matrix $M$,
+\begin{frml}
+	M = \mat{10 & -1 & 2 & -9 \\ 3 & 6 & -2 & 0 \\ -3 & 7 & 5 & 8}
+\end{frml}
+
+One choice of $\vp$ is $\vp = \mat{.1 \\ .2 \\ .7}$. One choice of $\vq$ is
+$\vq^T = \mat{.2 & .2 & .1 & .6}$.
+
+So the probabilities for each cell are 
+\begin{frml}
+	\vp\vq^T = \mat{.02 & .01 & .01 & .06 \\ .04 & .04 & .02 & .12 \\ .14 & .07 & .07 & .42} 
+\end{frml}
+
+And the way we measure the ``success'', in this game, is by the expected value.
+We can write this succinctly as $E_M(\vp, \vq) = \vp^T M \vq$.

@@ -1,0 +1,245 @@
+\pagebreak
+\section{Penalty and Barrier Methods}
+
+Now we're going to examine a slightly different approach to solving these
+constrained optimization problems. Namely, we're going to frame them in such a
+way that we can view them as unconstrained optimization problems.
+The purpose of this, of course, is to be able to use \textit{unconstrained} 
+optimization techniques for our constrained problems.
+
+Let's start by talking about \textit{penaly functions}.
+
+\subsection{Penalty Functions}
+
+\begin{defn}{positive function}{}
+For any $t \in \reals$ let 
+\begin{frml}
+	pos(t) = 
+\begin{cases}
+	t \text{ if } t \geq 0 \\
+	0 \text{ if } t < 0
+\end{cases}
+\end{frml}
+\end{defn}
+It's easy to see the point of this function. We only return
+the value of the function if it's positive, i.e. greater than 0.
+
+Now, let's return to our traditional problem setting. Consider the problem, P:
+\begin{frml}
+	\min \; f(x) \st &\vg(\vx) \leq \vzero,\\ &\vx \in S
+\end{frml}
+where $S \subseteq \reals^n$ is a non-empty set, and $f, \; \forall i \; \vg_i: S \rightarrow \reals$ are continuous.
+
+\begin{defn}{Penalty Function}{}
+Assume you are given a positive integer $\gamma$.
+\bigskip \\
+Then the \textbf{penalty function} is, for all $\vx \in S$
+\begin{frml} 
+	\alpha(\vx) = \sum_{i=1}^m pos(\vg_i(\vx))^\gamma
+\end{frml}
+\end{defn}
+This function is just concerned with the \textit{positive} parts of $\vg_i(\vx)$,
+where the purpose of $\gamma$ is to almost \textit{emphasize} that positive part.
+
+\textit{Note: $\forall \vx \in S$  that $\alpha(\vx) = 0 \iff \vx$ feasible in P}.
+So we can think of this as giving us a \textit{weight} for each piece of $\vg$ that
+is infeasible, giving us a sense of how infeasible a given $\vx$ is.
+
+\textit{Note: if you pick $\gamma=2$ then the function is continuously differentiable.
+If you pick $\gamma=3$ then the function is \text{twice} continuously differentiable.}
+So you can pick and choose how differentiable your penalty function is.
+
+\begin{defn}{Auxiliary Function and Problem}{}
+Assume you are given a positive scalar $\beta$ 
+\bigskip\\
+The \textbf{auxiliary function} is, for all $\vx \in S$,
+\begin{frml}
+	\Psi_\beta(\vx) &= f(x) + \beta \sum_{i=1}^m pos(\vg_i(\vx))^\gamma \\ &= f(\vx) + \beta * \alpha(\vx)
+\end{frml}
+$\Psi_\beta$ is continuous, since $\beta$ is finite. 
+\bigskip\\
+Each auxiliary function gives us an optmization problem called the \textbf{Auxiliary Problem}
+defined as
+	\begin{frml}
+		P_\beta: \min \Psi_\beta(\vx), \\ \st \vx \in S
+	\end{frml}
+which we're interested in optimizing.
+\end{defn}
+
+We can see here that if $\beta = \infty$ then solving this problem is essentially
+the same as solving the constrained problem. That's not quite applicable though,
+because if $\beta$ is $\infty$, then our function is not continuous. However,
+that notion is the general idea of this setup, (to punish infeasibility while
+we optimize).
+
+Now, we have a simple algorithm sketch which we claim solves this problem:
+\begin{algorithm}
+\caption{Penalty Function Algorithm}
+	\KwIn{$\delta > 1, \gamma$, tolerance $\tau$}
+	\KwOut{$\vx$ that is ``feasible enough''}
+	\For{$k = 1, 2, 3, \ldots, $ until termination condition}{
+		$\vx \leftarrow $ solution to \textit{Auxiliary Problem } $P_{\delta^k}$ \;
+		Terminate if $\delta^k * \alpha(\vx)$ less than $\tau$ \;
+	}
+\end{algorithm}
+Note that our $\beta = \delta^k$ is growing each iteration. This is sometimes
+called the ``exterior penalty function methodology'' since most of the
+$\vx$ being considered are \textit{oustide} of the feasible region of P.
+
+\begin{theo}{}{}
+	All notation as above. 
+	\medskip\\
+	For all $\beta > 0$, suppose that the \textit{auxiliary problem} $P_\beta$ 
+	has a global min, which we name $\vx_\beta$ . 
+	Suppose, also, that
+	P also has a global min, $\vx_\infty$.
+	Suppose further that $\{\vx_\beta\}_{\beta > 0}$ are contained in a compact subset of
+	$S$ (\textit{compactness} here just means closed and bounded).
+	In particular, this implies that $\exists$ a convergent sequence 
+	$\vx_{\beta_k} \rightarrow \bx \in S$ as $\beta_k \rightarrow \infty$
+	(\cref{defn:compactset}).
+	\medskip\\
+	\textit{Note: If $S$ is compact, then all of the above happens!
+	If $S$ is compact, and we know that $\vg(\vx) \leq \vzero$ defines a closed set, then
+the intersection of these sets if compact!}
+	\bigskip\\
+	Then we have all of the following:
+	\begin{enumerate}[i)]
+		\item
+		\begin{enumerate}[a)]
+			\item		
+				$\alpha(\vx_\beta)$ decreases as $\beta \rightarrow \infty$ .
+			\item
+				$f(\vx_\beta)$ increases as  $\beta \rightarrow \infty$.
+			\item
+				$\Psi_\beta(\vx_\beta)$ increases as $\beta \rightarrow \infty$.
+	\end{enumerate}
+\item
+	 $\alpha(\vx_\beta) \rightarrow 0$ as $\beta \rightarrow \infty$
+ \item
+	$\sup_{\beta > 0} \Psi_\beta(\vx_\beta) = lim_{\beta \rightarrow \infty} \Psi_\beta(\vx_\beta)
+	= f(\vx_\infty)$
+\item
+	$\bx$ is a global min of P
+\item
+	$\beta * \alpha(\vx_\beta) \rightarrow 0$ as $\beta \rightarrow \infty$
+	\end{enumerate}
+\end{theo}
+
+\textit{We have 5 (or really, 8) things to prove here, which we'll do in the order presented
+in the Theorem.}
+
+\begin{proof}[(i)]
+To show (i), note that for any $0 < \beta' < \beta''$ then
+\begin{frml}
+	f(\vx_{\beta''}) + \beta'*\alpha(\vx_{\beta''}) \geq^{(*)}
+f(\vx_{\beta'}) + \beta'*\alpha(\vx_{\beta'})
+\end{frml}
+by definition of $\vx_{\beta'}$ and similarly
+\begin{frml}
+	f(\vx_{\beta'}) + \beta''*\alpha(\vx_{\beta'}) \geq
+	f(\vx_{\beta''}) + \beta''*\alpha(\vx_{\beta''})
+\end{frml}
+again by definition of $\vx_{\beta''}$.
+If we add these inequalities, this yields
+\begin{frml}
+	(\beta'' - \beta')\bigg(\alpha(\vx_{\beta'}) - \alpha(\vx_{\beta''})\bigg) \geq 0
+\end{frml}
+We know that $\beta'' - \beta' > 0$ and so the second term here \textit{must} be
+$\geq 0$. Thus $\alpha(\vx_\beta)$ decreases as $\beta$ increases, as claimed in 
+(i.a).
+By (i.a) and inequality (*) we have 
+\begin{frml}
+f(\vx_{\beta''}) + \beta' * \alpha(\vx_{\beta'}) \geq
+f(\vx_{\beta''}) + \beta' * \alpha(\vx_{\beta''}) \geq
+f(\vx_{\beta'}) + \beta' * \alpha(\vx_{\beta'})
+\end{frml}
+Note the $\alpha(\vx_{\beta'})$ in the first equation. We can say this because
+we know (from (i.a)) that $\alpha(\vx_{\beta'}) > \alpha(\vx_{\beta''})$, since
+$\beta'' > \beta'$. In this form, we can \textit{cancel out} the $\alpha(\vx_{\beta'})$ 
+on either side, to obtain the inequality
+\begin{frml}
+	f(\vx_{\beta''}) \geq f(\vx_{\beta'})
+\end{frml}
+which shows that $f(\vx_\beta)$ increases as $\beta$ increases, as stated in (i.b).
+Next note that:
+\begin{frml}
+	\Psi_{\beta''}(\vx_{\beta''}) &= f(\vx_{\beta''}) + \beta'' * \alpha(\vx_{\beta''}) \\
+								  &\geq f(\vx_{\beta''}) + \beta''*\alpha(\vx_{\beta''}) + (\beta' - \beta'') \alpha(\vx_{\beta''}) 
+								  &\textit{since $\beta' < \beta''$}\\
+								  &= f(\vx_{\beta''}) + \beta' * \alpha(\vx_{\beta''}) \\
+								  &\geq^{(*)} f(\vx_{\beta'}) + \beta' * \alpha(\vx_{\beta'})\\
+								  &= \Psi_\beta' (\vx_{\beta'})
+\end{frml}
+which finally shows that $\Psi(\vx_{\beta})$ is increasing as $\beta$ increases,
+as claimed in (i.c).
+\end{proof}
+
+\begin{proof}[(ii)]
+For any $\epsilon > 0$, we \textit{claim} 
+that for every $\beta$ such that 
+$$\beta > \frac{1}{\epsilon} | f(\vx_\infty) - f(\vx_{\beta = 1})| + 2$$
+then $\alpha(\vx_\beta) \leq \epsilon$. Note that if we show that this claim holds, 
+then this proves \textit{(ii)}, since by \textit{(ia)} and the fact that epsilon 
+is arbitrary, then $\alpha(\vx_\beta) \rightarrow 0$.
+
+Suppose the above is \textit{not true}, i.e. 
+\begin{frml}
+\exists \; \beta  \st
+\beta > \frac{1}{\epsilon} | f(\vx_\infty) - f(\vx_{\beta = 1})| + 2 \text{ and }
+\alpha(\vx_\beta) > \epsilon
+\end{frml}
+
+Then
+\begin{frml}
+	f(\vx_\infty) &= \Psi_\beta(\vx_\infty) &\textit{ because $\vx_\infty$ is feasible, and thus has no penalty} \\
+				  &\geq \Psi_\beta(\vx_\beta) &\textit{ Because $\vx_\beta$ is optimal in $\Psi_\beta$ } \\
+				  &= f(\vx_\beta) + \beta * \alpha(\vx_\beta) \\
+				  &\geq f(\vx_1) + \beta * \alpha(\vx_\beta) &\textit{ because $f(\vx_\beta)$ increases as beta increases (ib)} \\
+				  &> f(\vx_1) + |f(\vx_\infty) - f(\vx_1) | + 2\epsilon &\textit{ by note below}\\
+				  &> f(\vx_\infty)
+\end{frml}
+
+\textit{Note: This last inequality is due to the following arithmetic using our assumptions above:}
+\begin{frml}
+	\beta \alpha(\vx_\beta) \geq \epsilon \beta > \epsilon * \frac{1}{\epsilon}|f(\vx_\infty) - f(\vx_1)| + \epsilon * 2
+\end{frml}
+
+This series of inequalities is a contradiction, showing that our initial claim is correct
+and thus \textit{(ii)} holds.
+\end{proof}
+
+\begin{proof}[(iii) \& (iv)]
+Recall that $\alpha$ is a continuous
+function. Then, $\vx_{\beta_k} \rightarrow \bx$ as $\beta_k \rightarrow \infty$ (by compactness),
+and \textit{(ii)} together imply that $\alpha(\bx) = 0 $, i.e. $\bx$ is feasible in P.
+Then:
+\begin{frml}
+	\forall \; \beta > 0, \; f(\vx_\infty) = \Psi_\beta (\vx_\infty) \geq \Psi_\beta(\vx_\beta)
+	&\implies f(\vx_\infty) \geq \sup_{\beta>0} \Psi_\beta (\vx_\beta) \\
+	&\implies f(\vx_\infty) \geq \sup_{\beta > 0} \Psi(\beta(\vx_\beta) \geq f(\vx_{\beta_k}), \forall k \\
+	\textit{(by the continuity of f) }	&\implies f(\vx_\infty) \geq^{(1)} \sup_{\beta>0} \Psi_\beta (\vx_\beta)\geq f(\bx) \geq^{(2)} f(\vx_\infty)
+\end{frml}
+Note that we then must have equality throughout this last line. Equality
+in inequality (1) shows \textit{(iii)} and equality in inequality (2) shows \textit{(iv)}.
+\end{proof}
+
+\begin{proof}[(v)]
+
+First, note that 
+\begin{frml}
+	\Psi_\beta(\vx_\beta) - f(\vx_\beta) = \beta * \alpha(\vx_\beta)
+\end{frml}
+Now, recall that, as shown in \textit{(iii)},
+the $\lim_{\beta \rightarrow \infty} \Psi_\beta(\vx_\beta) = f(\vx_\infty)$.
+Then, by \textit{(i.b) \& (iv)}, 
+\begin{frml}
+	\lim_{\beta \rightarrow \infty} f(\vx_\beta) = f(\bx) = f(\vx_\infty)
+	&\implies \Psi_\beta(\vx_\beta) - f(\vx_\beta) \rightarrow f(\vx_\infty) - f(\vx_\infty) = 0 \text{ as } \beta \rightarrow \infty \\
+	&\implies \beta * \alpha(\vx_\beta) \rightarrow 0 \text{ as } \beta \rightarrow \infty
+\end{frml}
+which finally shows \textit{(v)}.
+\end{proof}
+
+Finally, we have now shown all the claims in the theorem, and thus the theorem
+is proven.

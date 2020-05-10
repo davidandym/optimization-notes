@@ -1,0 +1,221 @@
+\pagebreak
+\section{Linear Programming}
+
+Now we get into the first, general type of problem that we will be dealing with:
+Optimizing a linear function with linear constraints.
+
+
+\subsection{Standard and Canonical Form}
+
+\begin{defn}{Standard and Canonical Form}{}
+Let 
+$\vA \in \reals^{m\times n}, \; \vb \in \reals^m, \; \vc \in \reals^n$.
+\bigskip\\
+The \textbf{Standard form} of a linear program LP is:
+\begin{frml}
+	&\min \vc^T \vx \\
+	&\st \vA \vx = \vb, \; \vx \geq \vzero
+\end{frml}
+
+The \textbf{Canonical form} or \textit{Symmetric form} of an LP is:
+\begin{frml}
+&\min \vc^T\vx \\
+&\st \vA\vx \geq \vb, \; \vx \geq \vzero
+\end{frml}
+\textit{Note that in either case, our variables are the components of $\vx \in \reals^n$.}
+\end{defn}
+
+Note that we can easily go between the two forms. The primary difference
+here is that Standard form expects $\vA\vx = \vb$ and Canonical allows 
+$\vA\vx \geq \vb$.
+
+\begin{itemize}
+	\item Standard to canonical ($= \; \rarrw \; \geq$):
+		We've already seen how to do this when discussing Polyhedral Sets.
+		\begin{frml}
+			\vA\vx = \vb \rarrw 
+			\begin{bmatrix} \vA \\ -\vA \end{bmatrix} \vx \geq \vb
+		\end{frml}
+
+	\item Canonical to standard ($\geq \; \rarrw \; =$):
+		This one is less obvious. We need to introduce a slack variable.
+		Let's take an example in one dimension.
+		\begin{frml}
+			\vA_{1,1}\vx_1 + \vA_{1,2}\vx_2 \geq b \rarrw
+			\vA_{1,1}\vx_1 + \vA_{1,2}\vx_2- \vx_3 = b  \\
+			\st \vx_1, \vx_2, \vx_3 \geq 0
+		\end{frml}
+
+		We call $\vx_3$ our slack variable. We can make one of these for each
+		of our $m$ rows (constraints), and put them into a vector called $\vz$,
+		in the original problem.
+		Thus, we can incorporate these to convert our canonical form into 
+		standard form in the following way:
+		\begin{frml}
+			\vA \vx \ge \vb \rarrw 
+			\begin{bmatrix} \vA & | & -I \end{bmatrix}
+			\begin{bmatrix} \vx \\ \vz \end{bmatrix}
+			= \vb
+		\end{frml}
+
+\end{itemize}
+
+\pagebreak
+Other transformations we can make to get things into the correct form:
+\begin{itemize}
+	\item
+		$\max \vc^T\vx = \min\; -\vc^T\vx$
+	\item
+		unsigned variable $\vx_1$ can be converted into $\vx_1 - \vx_2$, where
+		both $\vx_1, \vx_2 \geq 0$.
+	\item
+		we can rearrange variables and columns, e.g.
+		\begin{frml}
+			\begin{bmatrix} \vA^{(1)} & \vA^{(2)} & \vA^{(3)} \end{bmatrix}
+			\begin{bmatrix} \vx_1 \\ \vx_2 \\ \vx_3 \end{bmatrix}
+			 = 
+			\begin{bmatrix} \vA^{(2)} & \vA^{(3)} & \vA^{(1)} \end{bmatrix}
+			\begin{bmatrix} \vx_2 \\ \vx_3 \\ \vx_1 \end{bmatrix}
+		\end{frml}
+	\item
+		We can perform basic \textit{row operations}.
+		Take an augmented matrix representing $\vA\vx = \vb$, i.e.
+		$\begin{bmatrix} \vA & | & \vb\end{bmatrix}$.
+		We can always 
+		\begin{enumerate}
+			\item
+				Multiply a row by non-zero scalar
+			\item
+				Swap any 2 rows
+			\item
+				Add a row to another
+		\end{enumerate}
+		These row operations can be accomplished through multiplying the 
+		augmented matrix with invertible matrices (we can always undo them).
+\end{itemize}
+None of these transformations change the solution of the original problem, so we're free
+to change things up in these ways as we please.
+
+\subsection{Basic Feasible Solutions}
+
+Let $\vA \in \reals^{m \times n}, \vb \in \reals^m, \vc, \vx \in \reals^n$.
+Consider an LP in standard form:
+\begin{frml}
+	&\min \vc^T\vx \\
+	&\st \vA\vx = \vb, \vx \geq \vzero
+\end{frml}
+
+
+\begin{defn}{Basic Feasible Solution}{}
+WLOG assume that $\vA$ is full row-rank. 
+\textit{If it isn't, we can row-reduce it to
+remove redundant constraints.}
+\medskip\\
+If we can write $\vA = \mat{B & | & N}$ where $B \in \reals^{m \times m}$ is
+invertible, and $B^{-1}\vb \geq \vzero$, then 
+\begin{frml}
+	\bx = \mat{B^{-1}\vb \\ \vzero}
+= \mat{\bx_B \\ \bx_N}
+\end{frml}
+is feasible in LP, and called a \textbf{basic feasible solution (bfs)}. 
+\medskip\\
+We can additionally write $\vc = \mat{\vc_B \\ \vc_N}$, and thus the objective
+function value of this bfs is 
+\begin{frml}
+	\textbf{ofv}(\bx) = \vc_B^TB^{-1}\vb
+\end{frml}
+In this scenario, we call $B$ the \textit{basis}, $\bx_B$ the \textit{basic variables}, 
+and $\bx_N$ the \textit{non-basic variables.}
+\end{defn}
+
+In general, if $B \in \reals^{m \times m}$ is a sub-matrix of $\vA$, say
+\begin{frml}
+	B = \mat{\vA^{(k_1)} & | & \vA^{(k_2)} & | & \vA^{(k_3)} & | & \ldots 
+						 & | & \vA^{(k_m)}}
+\end{frml}
+and $B$ is invertible and $B^{-1}\vb \geq \vzero$, then we can define an
+$\bx \in \reals^n$ where $\forall i = 1, \ldots, m \;\; \bx_i = (B^{-1}\vb)_i$ 
+and all other components of $\bx$ are zero. It's obvious to see why
+this $\bx$ is feasible in LP, and thus constitutes a solution (not necessarily
+an optimal solution in LP).
+
+\textit{Note that any bfs is an extreme point of the feasible region of an LP. To see
+this, simply notice that all of the basis columns (where $\bx_i$ is non-zero) 
+are linearly independent.}
+
+\subsubsection{Reduced Cost Coefficients}
+
+Continuing as above, let's suppose $\bx$ is a bfs of LP. 
+Then, 
+WLOG we can write 
+		\begin{frml}
+			\vA = \mat{B & | & N}, 
+			\bx = \mat{\bx_B \\ \bx_N} = \mat{B^{-1}\vb \\ \vzero}, \vc = \mat{\vc_B \\ \vc_N}
+		\end{frml}
+\textit{Remember, we can always re-arrange our rows and columns until we get to this point!}
+
+We can also take any other $\vx$ and write it as $\vx = \mat{\vx_B \\ \vx_N}$, separating
+the components which multiply into the basis $B$ and the components which multiply
+by the other part of $\vA$, $N$. 
+If $\vx$ is feasible, $\vA\vx = \vb$, then that means $B\vx_B + N\vx_N = \vb$, 
+which we can rewrite as 
+\begin{frml}
+	\vx_B = B^{-1}(\vb - N\vx_N) = \bx_B - B^{-1}N\vx_N
+\end{frml}
+Thus, we can re-write the \textit{basic} components of \textit{any} $\vx$
+in terms of our bfs ($\bx$ ), and the non-basic variables of $\vx$!
+Thus, any feasible $\vx$ consists of an $\vx_N \geq \vzero$ such that
+$\vx_B = B^{-1}(\vb - N\vx_N) \geq \vzero$. 
+
+\textit{This is kind of like looking at the point $\vx$ through the lens of Basis $B$,
+where our non-basic variables $\vx_N$ determine ``how far'' $\vx$ is from $\bx$.}
+
+
+All feasible points $\vx$ can be enumerated like this.
+Such a point $\vx$ has ofv 
+\begin{frml}
+	\textbf{ofv}(\vx) &= \vc^T\vx = \vc_B^T\vx_B + \vc_N^T\vx_N  \\
+					  &= \vc_B^TB^{-1}(\vb - N\vx_N) + \vc_N^T\vx_N \\
+					  &= \vc_B^TB^{-1}\vb + (\vc_N^T - \vc_B^TB^{-1}N)\vx_N
+\end{frml}
+
+Note that $\vc_B^TB^{-1}\vb$ is the ofv of our bfs $\bx$. 
+
+\begin{defn}{Reduced Cost Coefficients}{}
+	All notation as above.
+	\medskip\\
+	Let $\vx \in \reals^n$ be feasible in LP, with ofv:
+\begin{frml}
+	\textbf{ofv}(\vx) = \vc_B^TB^{-1}\vb + (\vc_N^T - \vc_B^TB^{-1}N)\vx_N
+\end{frml}
+Then $(\vc_N^T - \vc_B^TB^{-1}N) = \vr_N^T$ are called the \textbf{reduced cost coefficients}.
+\medskip\\
+Each  component of $\vr_N$ corresponeds to a component of the \textit{non-basic} variables $\vx_N$.
+\end{defn}
+
+The variables of $\vx_B$ are now \textit{implicit}, given $\vx_N$ and $B$. 
+
+Finally, note that from this equation
+we can get $\frac{\delta ofv}{\delta \vx_N} = \vr_N$. This rate of change corresponds
+to how the ofv of $\bx$ increases or decreases as we change $\vx_N$.
+\begin{prop}{}{}
+	Let $B$ be a basis of LP, and assume that $\bx$ denote the basic feasible solution for basis $B$.
+	\medskip\\
+If the reduced cost coefficients defined by $\bx$ and $B$ are all positive,
+\begin{frml}
+	(\vc_N^T - \vc_B^TB^{-1}N) = \vr_N^T \geq \vzero
+\end{frml}
+then your bfs $\bx$ is optimal in LP.
+\end{prop}
+
+\begin{proof}[]
+	\textit{We provide a sketch of the proof}
+
+We can see \textit{every feasible point} from the basis-lens of $\bx$. If our
+reduced cost coefficients are all positive that implies that
+$$\forall \vx \text{ feasible in LP },  \textbf{ofv}(\vx) \geq \textbf{ofv}(\bx)$$
+since $\vx \geq 0$ is a constraint on feasibility.
+So no other feasible point can 
+have a lower ofv than our current bfs $\bx$. Thus, $\bx$ is optimal!
+\end{proof}
+

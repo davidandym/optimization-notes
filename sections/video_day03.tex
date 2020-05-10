@@ -1,0 +1,189 @@
+\pagebreak
+\section{Newton's Method and Interior Point Methodology}
+
+\subsection{Newton's Method}
+
+Suppose we have a component-wise function $F: \reals^n \rarrw \reals^n$, component-wise continuously differentiable.
+Suppose, additionally, that we seek a ``zero'' or ``root'' of 
+$F$, $\vx^* \in \reals^n$ s.t.  $F(\vx^*) = \vzero$.
+Then \textbf{Newton's Method} gives us a way to solve for this $\vx^*$.
+
+\textit{Note: This comes up a lot in, say, unconstrained optimization, where we seek a point of
+a function where it's gradient is zero. Well, the gradient is a function from 
+$\reals^n \rarrw \reals^n$, so it fits into this design.}
+
+Newton's method is outlined in Algorithm~\ref{alg:newtons}.
+
+\begin{algorithm}\label{alg:newtons}
+\caption{Newton's Method}
+	\KwIn{$F: \reals^n \rightarrow \reals^n$}
+	\KwOut{$\vx^* \st F(\vx^*) \approx \vzero$}
+	$k \leftarrow  0$\;
+	$\vx^{(0)}  \leftarrow $ some initial guess\;
+	\While{$F(\vx^{(k)} \not \approx \vzero$} {
+		Define $G^{(k)}: \reals^n \rightarrow \reals^n$ to be a linear approximation of $F$ about $\vx^{(k)}$\;
+		$\vx^{(k+1)}$ is defined  $\st G^{(k)}(\vx^{(k+1)}) = \vzero$\;
+		 $k \leftarrow k+1$
+	}
+\end{algorithm}
+
+$F$ is a component-wise function, of the form 
+$F = \mat{F_1 \\ F_2 \\ \vdots \\ F_n}$, and we require that $\forall i\;
+F_i : \reals^n \rightarrow \reals$ is continuously differentiable.
+The $G$ function is meant to be a linear approximation of $F$ about $\vx^{(k)}$.
+We know that we can use Taylor Series to approximate
+this function. In particular, we'll use the first-order approximation, since we know
+that $F_i$ is continuously differentiable, and the approximation is linear.
+So, let's define
+\begin{frml}
+	G_i(\vx) = F_i(\vx^{(k)}) + \nabla F_i^T(\vx^{(k)})(\vx - \vx^{(k)}) \approx F_i(\vx)
+\end{frml}
+
+We can stack all of these up, such that:
+\begin{frml}
+	G(\vx) = F(\vx^{(k)}) + \mat{
+		\nabla F_1^T(\vx^{(k)}) \\ 
+		\nabla F_2^T(\vx^{(k)}) \\ 
+		\vdots \\
+		\nabla F_n^T(\vx^{(k)})
+	} (\vx - \vx^{(k)}) \approx  F(\vx)
+\end{frml}
+where we refer to the big matrix of gradients as the Jacobian of $F$, $\nabla F^T(\vx^{(k)})$.
+
+\subsubsection{The Newton Direction}
+
+In the inner loop of Newton's method we want to find $\vx^{(k+1)}$ to be the vector such that
+$\vzero = F(\vx^{(k)}) + \nabla F^T(\vx^{(k)})(\vx^{(k+1)} - \vx^{(k)})$, i.e. we want
+\begin{frml}
+-F(\vx^{(k)}) = \nabla F^T(\vx^{(k)})(\vx^{(k+1)} - \vx^{(k)})
+\end{frml}
+
+Note here that the, given the previous iterates $\vx^{(k)}$, the Jacobian is a 
+fixed matrix in $\reals^{n \times n}$,
+and $-F(\vx^{(k)})$ is a fixed vector in $\reals^n$, so we only need to 
+solve for $(\vx^{(k+1)} - \vx^{(k)})$, which we can do by simply solving the
+linear system.
+\begin{frml}
+	\vx^{(k+1)} = \vx^{(k)} - \big( \nabla F(\vx^{(k)})^T \big)^{-1} F(\vx^{(k)})
+\end{frml}
+\textit{Note: Normally, we would just solve via computational methods, rather than actually
+trying to invert the matrix for an analytical solution, since inverting the
+matrix is often very expensive.}
+
+\begin{defn}{Newton Direction}{}
+All notation as above.
+
+\medskip
+For any given iterate $k+1$, with solution
+\begin{frml}
+	\vx^{(k+1)} = \vx^{(k)} - \big( \nabla F(\vx^{(k)})^T \big)^{-1} F(\vx^{(k)})
+\end{frml}
+
+The \textbf{Newton Direction},
+\begin{frml}
+	- \big( \nabla F(\vx^{(k)})^T \big)^{-1}F(\vx^{(k)})
+\end{frml}
+is the direction moved away from the last iterates solution, $\vx^{(k)}$
+\end{defn}
+
+
+\subsubsection{An application of Newton's Method: 2nd order optimization}
+
+Suppose $f: \reals^n \rarrw \reals$ is twice continuously differentiable, 
+and you are looking for the min or max of $f$. 
+In this case, you are looking for a stationary point
+of $f$, i.e. an $\vx^* \in \reals^n \st \nabla f(\vx^*) = \vzero$.
+Notice that $\nabla f: \reals^n \rarrw \reals^n$. And note that the Jacobian
+of $\nabla f$ is exactly $\nabla^2 f$, the Hessian!
+
+If we plug in our analytical solution at step $i$, then we have that
+\begin{frml}
+	\vx^{(i+1)} = \vx^{(i)} - \big( \nabla^2 f(\vx^{(i)}) \big)^{-1} \nabla f(\vx^{(i)})
+\end{frml}
+which gives us a way to optimize towards the min or max of a function using it's
+Hessian.
+
+\subsection{Interior Point Methodology: Solving a Quadratic Program with Inequalities}
+
+In this section, we'll see how to tackle a QP with inequality
+constraints using a modified version of Newton's Method, called
+Interior Point Methodology.
+
+Suppose $Q \in \reals^{n \times n}$ is sym, PD., and $A \in \reals^{m \times n}$
+is full row rank, $\vb \in \reals^m, \vc \in \reals^n$. Let's define the
+quadratic program QP, in standard form, as:
+
+\begin{frml}
+	\min \frac{1}{2}\vx^TQ\vx+\vc^T\vx 
+	\st &A\vx = \vb, \\ &\vx \geq \vzero \\
+\end{frml}
+
+\textit{If $Q$ had negative eigenvalues, this problem would be NP-hard. 
+Additionally, note that $Q$ being PD means that the hessian is PD as well, and
+thus our function is strictly convex. Finally, note that $A$ being full-row rank
+is without loss of generality, since otherwise we could row-reduce to make it so.}
+
+Let's start by re-writing our constraints as
+\begin{frml}
+	A\vx - \vb = \vzero \\
+	-I\vx \leq \vzero
+\end{frml}
+
+We already know that, since our function is convex, if our feasible region is 
+closed, then there must exist a global min. Additionally, we know that if the
+feasible region is convex, then the global min is unique.
+In our case, the feasible region is closed, \textit{and convex}, since it's a
+polyhedral set. Thus, in this problem we know that we have a unique global min.
+Finally, since $A$ is full row-rank, this satisfies a constraint qualification.
+This means that a KKT point is \textit{necessary} for a global min. We will see
+later that, in fact, the KKT conditions are sufficient for global optimality,
+in this problem.
+
+\subsubsection{KKT Conditions of our problem}
+The KKT conditions of this QP look like:
+\begin{itemize}
+	\item $Q\vx + \vc + \mat{A^T & | & -I}\mat{\vy \\ \vz} = \vzero$
+	\item $\vz \geq \vzero$ 
+	\item $\vz^T\vx = 0$ 
+\end{itemize}
+\textit{Note: We've broken up our KKT multipliers such that $\vy \in \reals^m$ correspond
+to the $m$ constraints, and $\vz \in \reals^n$ correspond to the negative identity.
+Additionally, we have greatly simplified the conditions on $\vy$ as explained in
+\S~\ref{sec:kkt-trick}}
+
+Now, we can compose \textbf{both} our primal feasibility constraints and our KKT
+conditions into one big function $F : \reals^{n + m + n} \rarrw \reals^{n + m + n}$
+as
+\begin{frml}
+	F(\mat{\vx \\ \vy \\ \vz}) = \mat{Q\vx + \vc + A^T\vx - \vz \\ A\vx - \vb \\ \vz \circ \vx}
+\end{frml}
+
+Now, observe that $\vx^*$ is feasible and a KKT point with KKT multipliers $\vy^*, \vz^*$
+iff 
+\begin{frml}
+	F(\mat{\vx^* \\ \vy^* \\ \vz^*}) = \vzero, \;  \vx^* \geq \vzero , \; \text{and} \; \vz^* \geq \vzero
+\end{frml}
+
+The constraint $A\vx^* = \vb$ is covered by the ``middle chunk'' of $F$, 
+and $\vx \geq \vzero$ is just copied over. 
+So we have primal feasibility, above. Additionally, the first KKT condition is 
+covered by the ``top chunk'' of $F$. 
+The second condition is covered by the ``bottom chunk'' of
+$F$ (since every element of the dot product must be zero, as shown before). And
+the last condition is, again, just copied over.
+
+
+The Jacobian of $F$ is:
+\begin{frml}
+	\nabla F^T(\mat{\vx \\ \vy \\ \vz}) = \mat{Q & A & -I \\ A & 0 & 0 \\ \text{diag(z)} & 0 & \text{diag(x)}}
+	= \mat{\nabla F_1(\cdot)^T \\ \nabla F_2(\cdot)^T \\ \vdots \\ \nabla F_{n+m+n}(\cdot)^T} \in \reals^{(n + m + n) \times (n + m + n)}
+\end{frml}
+
+\textit{Note:  Since $Q$ is PD, $A$ is full row rank, then if we assume that $\vz$ and $\vx$
+are \textit{positive} ($> \vzero$) vectors, then this gigantic matrix is invertible.}
+
+Our problem is now in a form that looks \textit{nearly} suitable for Newton! 
+The only concern is the non-negative
+constraints on $\vx$ and $\vz$. We need a way to take Newton steps without breaking
+our positivity constraints.
+

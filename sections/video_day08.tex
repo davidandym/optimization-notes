@@ -1,0 +1,113 @@
+
+\subsection{Lagrangian Saddle Points}
+
+\begin{defn}{Lagrangian Saddle Point}{}
+$\bx \in S, \bar{\lambda} \in \reals^m_{\geq 0}$ are a 
+\textbf{saddle point} of the Lagrangian if 
+\begin{frml}
+	\forall \vx \in S, \lambda \in \reals^m_{\geq 0}, \;\; \mathcal{L}(\bx, \lambda)
+	\leq_{(1)} \mathcal{L}(\bx, \bar{\lambda}) \leq_{(2)} \mathcal{L}(\vx, \bar{\lambda}) \\
+\end{frml}
+\end{defn}
+
+\begin{theo}{A}{}
+	All notation as above.
+	\medskip\\
+	$\bx, \bar{\lambda}$ are a saddle point of
+	Lagrangian iff 
+	\begin{enumerate}[i)]
+		\item $\forall \vx \in S, \; \mathcal{L}(\bx, \bar{\lambda}) \leq \mathcal{L}(\vx, \bar{\lambda})$
+			\textit{(i.e. ineq. 2 above)}
+		\item $\vg(\bx) \leq \vzero$
+		\item $\bar{\lambda}^T\vg(\bx) = 0$
+	\end{enumerate}
+\end{theo}
+
+\begin{proof}[]
+\textit{All we really need to show is that item (ii) \& (iii) in the proof
+imply inquality (1) in the saddle point definition, since inequality (2) is already
+satisfed by item (i) of the theorem. }
+
+So we need to show that 
+$\vg(\bx) \leq \vzero, \bar{\lambda}^T\vg(\bx) = 0 \iff \forall \lambda \in \reals^m_{\geq 0}, \; \mathcal{L}(\bx, \lambda) \leq
+\mathcal{L}(\bx, \bar{\lambda})$.
+
+($\implies$) Suppose (1) in the definition holds( i.e. $\forall \lambda \in \reals^m_{\geq 0}, \;
+f(\bx) + \lambda^T\vg(\bx) \leq f(\bx) + \bar{\lambda}^T\vg(\bx)$) 
+
+By way of contradiction, if $\exists i \st \vg_i(\bx) > 0$, then send $\lambda_i = \infty$,
+and all other components to zero. Then we have just provided a $\lambda$  that
+obviously contradicts (1). So this can't be true, and $\vg(\bx) \leq \vzero$,
+which satisfies (ii).
+
+Next, consider the case where $\lambda = \vzero$. Since (1) is true, we can pick
+this lambda and it still must hold that 
+\begin{frml}
+	f(\bx) + \lambda^T\vg(\bx) \leq f(\bx) + \bar{\lambda}^T\vg(\bx)
+\end{frml}
+and thus
+we have 
+\begin{frml}
+	f(\bx) \leq f(\bx) + \bar{\lambda}^T\vg(\bx) \implies 0 \leq \bar{\lambda}^T\vg(\bx)
+\end{frml}
+However, since $\bar{\lambda} \geq 0$ and $\vg(\bx) \leq 0$, then 
+$0 \leq \bar{\lambda}^T\vg(\bx) \leq 0$, and thus  $\bar{\lambda}^T\vg(\bx) = 0$,
+and so (iii) holds as well.
+
+($\impliedby$) Suppose that (ii) and (iii) hold. We want to show that (1) holds.
+Let's do that:
+\begin{frml}
+\forall \lambda \in \reals^m_{\geq 0}, \; \mathcal{L}(\bx, \lambda) = f(\bx) + 
+\lambda^T\vg(\bx) \leq f(\bx) = f(\bx) + \bar{\lambda}^T\vg(\bx) = \mathcal{L}(\bx, \bar{\lambda})
+\end{frml}
+which shows that (1) holds, which completes the proof.
+\end{proof}
+
+\begin{theo}{B}{}
+	$\bx \in S, \bar{\lambda} \in \reals^m_{\geq 0}$ are a saddle point of the
+	Lagrangian iff $\bx$ is a global min of P and $\bar{\lambda}$ is a global
+	max of P's Lagrangian dual DP, and there is no duality gap.
+\end{theo}
+
+\begin{proof}[]
+($\implies$) Suppose $\bx \in S, \bar{\lambda} \in \reals^m_{\geq 0}$
+are a saddle point of Lagrangian.
+Then
+
+\begin{frml}
+	\mathcal{L}(\bx, \bar{\lambda}) &= \inf_{\vx \in S} \mathcal{L}(x, \bar{\lambda}) &\text{ by thm. A(i) } \\
+									& \leq \sup_{\lambda \in \reals^m_{\geq 0}} \inf_{\vx \in S} \mathcal{L}(\vx, \lambda)
+									&\text{ by defs of sup and inf (3)} \\
+									&= \textbf{ofv}_{DP} &\text{ by def.}\\
+									&\leq \textbf{ofv}_{P} &\text{ by weak duality (4)}  \\
+									& \leq f(\bx) &\text{ $\bx$ is feasible in (P) by Them. A(ii) so $\vg(\bx) \leq \vzero$ (5)} \\
+									& = f(\bx) + \bar{\lambda}^T\vg(\bx) &\text{ by Thm. A(iii)} \\
+									&=\mathcal{L}(\bx, \bar{\lambda}) &\text{(6)}
+\end{frml}
+which completes our squeeze play, meaning that all of the values considered in here
+are equal. This shows several things, namely:
+\begin{itemize}
+	\item $\bx$ is optimal in (P) by equality in (5).
+	\item $\bar{\lambda}$ is optimal in (DP) by equality in (3).
+	\item no duality gap by equality in (4).
+	\item common \textbf{oofv} for (P) and (DP) is $\mathcal{L}(\bx, \bar{\lambda})$ by (6).
+\end{itemize}
+so having a saddle point gives us all these nice things.
+
+($\impliedby$) Suppose $\bx \in S$ optimal in (P), $\bar{\lambda}$ optimal in (DP)
+and there is no duality gap.
+\begin{frml}
+	\textbf{oofv}_{DP} &= \inf_{\vx \in S} \mathcal{L}(\vx, \bar{\lambda}) &\text{ since $\bar{\lambda}$ optimal}\\
+					   &\leq \mathcal{L}(\bx, \bar{\lambda}) &\text{ def of inf. (7)} \\
+					   &=f(\bx) + \bar{\lambda}^T\vg(\bx)  &\text{ def of $\mathcal{L}$} \\
+					   &\leq f(\bx) &\text{ since $\bar{\lambda} \geq \vzero, \vg(\bx) \leq \vzero$. (8)} \\
+					   &= \textbf{oofv}_{P} &\text{ since we said $\bx$ is optimal} \\
+\end{frml}
+
+and finally, no duality gap implies that all of these are equal! Now, note that 
+(7) implies Thm. A(i). The feasibility of $\bx$ implies Thm. A(ii). And finally
+equality in (8) implies Thm. A(iii). Thus, all of Thm. A's conditions hold,
+and thus $\bx, \bar{\lambda}$ are saddle points of the Lagrangian.
+\end{proof}
+
+

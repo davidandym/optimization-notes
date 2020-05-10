@@ -1,0 +1,141 @@
+\subsection{Frank-Wolfe Algorithm}
+This section will introduce one very simple algorithm for approaching general
+constrained optimization problems.
+
+Let's consider a very general problem, P:
+\begin{frml}
+	\min f(\vx) \st \vx \in S
+\end{frml}
+where
+\begin{itemize}
+	\item $f$ is cont. diff.
+	\item $S$ is a polyhedreal set, e.g.
+$S = \{ \vx \in \reals^n : \vA\vx \geq \vb, \vx \geq \vzero \}$,
+$S = \{ \vx \in \reals^n : \vA\vx = \vb, \vx \geq \vzero \}$,
+$S = \{ \vx \in \reals^n : \vA\vx = \vb\}$
+\end{itemize}
+
+The Frank-Wolfe Algorithm offers a very general solution to P.
+\begin{algorithm}
+\caption{Frank-Wolfe Algorithm}
+\KwIn{Problem (P)}
+\KwOut{Solution $\vx^{(k)}$}
+$\vx^{(0)} \leftarrow $ some initial guess \;
+\For{$i = 0,1,\ldots$ until a \textit{stopping criterion}}{
+	$\vc \leftarrow \nabla f(\vx^{(i)})$ \;
+	 Define $LP^{(i)}: \min \vc^T\vx \st \vx \in S$ \;
+	$\vz^{(i)} \leftarrow $ solution to $LP^{(i)}$\;
+	Define $P^{(i)}: \min_{\alpha \in [0,1]} f(\alpha\vz^{(i)} + (1 - \alpha)\vx^{(i)})$\;
+	$\alpha^{(i)} \leftarrow $ the solution to $P^{(i)}$ \;
+	$\vx^{(i+1} \leftarrow \alpha^{(i)}\vz^{(i)} + (1 - \alpha^{(i)})\vx^{(i)}$\;
+}
+	
+\end{algorithm}
+\textit{Note: This is basically choosing which direction to step based on the ``descent'' level of the
+immediate gradient, as well as the boundaries of your feasible region $S$.
+So you choose the most ``promising'' direction based on how far you can go
+and how much the gradient says you'll decrease in that direction.}
+
+Note a few important things about this algorithm 
+\begin{itemize}
+	\item The problem $LP^{(i)}$ is a linear program which we've now seen how 
+		to solve now.
+	\item The problem $P^{(i)}$ is a 1-dim optimization problem, that can be 
+		easily solved, either analytically or numerically.
+	\item At $\vx^{(i)}$, the first-order approxation of $f$, 
+		\begin{frml}
+			f(\vx) \approx g(\vx)
+		&= f(\vx^{(i)}) + \nabla f(\vx^{(i)})^T (\vx - \vx^{(i)}) \\
+		&= 
+		\bigg( f(\vx^{(i)}) - \nabla f(\vx^{(i)})\vx^{(i)} \bigg) 
+		+ \nabla f(\vx^{(i)})^T\vx \\
+		&= \text{constant} + \vc^T\vx 
+	\end{frml}
+	Thus, $LP^{(i)}$ is equivalent to minimizing $g(\vx)$, which is like saying
+	what $\vx$ around $\vx^{(i)}$ is minimal.
+\end{itemize}
+
+\pagebreak
+\section{The KKT Conditions}
+
+The KKT Conditions give us an important way to not only \textit{check} points for 
+optimality, but also to \textit{solve exactly} for optimal points in some scenarios. 
+This section
+will derive the KKT conditions for general constrained optimization problems,
+and then present them explicitly in a few examples.
+
+\subsection{Farkas' and Gordon's Theorems}
+
+In this section we will introduce 2 important theorems which will lead to the
+derivation of the KKT conditions.
+
+\begin{theo}{Farkas}{}
+Let $\vA \in \reals^{n \times m}, \vb \in \reals^m$.
+
+\medskip
+Then \textit{either} 
+\begin{enumerate}[(1)]
+	\item $\exists \vx \in \reals^n \st \vA\vx = \vb, \vx \geq \vzero$ 
+
+		or
+	\item $\exists \vy \in \reals^m \st \vb^T\vy > 0, \vA^T\vy \leq \vzero$
+\end{enumerate}
+
+One of these must hold, and the other must be false, for any $\vA, \vb$
+\end{theo}
+
+\begin{proof}[]
+Consider the problem and it's dual:
+\begin{frml}
+	LP&: \min \vzero^T\vx \st \vA\vx=\vb, \vx\geq\vzero  \\
+	DP&: \max \vb^T\vy \st \vA^T\vy \leq \vzero
+\end{frml}
+
+If (1) is true, then $LP$ is feasible and the \textbf{ofv} $= 0$. Then, by weak duality,
+$DP$ has no solution with \textbf{ofv} $> 0$. Then (2) is false.
+
+If (2) is false, then since DP is feasible with vector $\vy = \vzero$, with
+\textbf{ofv} $ = 0$, we know that this is the max ofv of the DP (by 
+(2) being false).
+Since the DP has a solution, then LP must also have a solution and be feasible
+(with \textbf{ofv} $= 0$ ),
+and thus (1) is true.
+
+\end{proof}
+
+\begin{theo}{Gordon}{}
+Let $\vA \in \reals^{n \times m}$. 
+
+\medskip
+Then \textit{either}:
+\begin{enumerate}[(1)]
+	\item $\exists \vx \in \reals^n \st \vA\vx=\vzero, \vx \geq \vzero, 
+		\vx \neq \vzero$, or
+	\item $\exists \vy \in \reals^m \st \vA^T\vy < \vzero$
+\end{enumerate}
+\end{theo}
+
+\begin{proof}[]
+
+(2) being true $\iff \exists \vy \in \reals^m, \epsilon > 0 \st \vA^T\vy + \epsilon
+\vone \leq \vzero$.
+We can rewrite this statement in matrix form:
+\begin{frml}
+	\exists \mat{\vy \\ \epsilon} \in \reals^{m + 1} \st \mat {\vzero \\ 1}
+	\mat{\vy \\ \epsilon} > 0, \mat{\vA^T & | & \vone}\mat{\vy \\ \epsilon}
+	\leq \vzero
+\end{frml}
+Note that this re-writing looks a lot like Farkas' setup, where $A^T = \mat{A^T & | & \vone}$
+and $\vb = \mat{\vzero \\ 1}$. Thus, we can
+say that (2) is true iff
+\begin{frml}
+	\centernot \exists \vx \in \reals^n,\; \vx \geq \vzero,\; \st \mat{\vA \\ \vone^T}\vx = \mat{\vzero \\ 1}
+\end{frml}
+which we can restate as $\centernot \exists \vx \in \reals^n \st \vA\vx=\vzero,
+\vx \geq \vzero$ and the coordinates of $\vx$ sum to one, which is true iff
+$\vx \neq \vzero$ 
+(since we can arbitrarily scale $\vx$
+until it's componenents summed to one without affecting the homogenous solution)
+which is when (1) is false. Thus (2) is true iff (1) is false.
+	
+\end{proof}

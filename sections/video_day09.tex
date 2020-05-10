@@ -1,0 +1,221 @@
+\subsection{KKT Conditions}
+
+\begin{coro}{}{}
+KKT conditions are sufficient for optimality in a convex program.
+\medskip\\
+\textit{(No need for Constrant Qualifications!)}
+\medskip\\
+A \textbf{convex program} is defined as
+\begin{frml}
+	(P): \;  \min f(x) \st \vg(\vx) \leq \vzero, \vx \in S
+\end{frml}
+where 
+\begin{itemize}
+	\item
+$S \subseteq \reals^n$ non-empty, open, convex
+\item
+$f:S\rarrw \reals$ cont. diff. and convex
+\item $\forall i=1, 2, \ldots, m \; g_i:S\rarrw \reals$ cont. diff.
+and convex.
+\end{itemize}
+\end{coro}
+
+\begin{proof}[]
+	
+	\textit{The sketch is as follows:}
+\[
+	\text{KKT conditions $\implies$ Saddle Point by Thm. A $\iff$ Optimal by Thm. B}
+\]
+
+If $\bx, \bar{\lambda}$ satisfy KKT conditions, that says the following:
+\begin{frml}
+	& \vg(\bx) \leq \vzero, \bx \in S, &\text{ primal feas. of }\bx \\
+	& \text{ and } \bar{\lambda} \geq \vzero  &\text{ dual feasibility}\\
+	& \text{ and } \bar{\lambda}^T\vg(\bx) = 0 &\text{ complimentary slackness}\\ 
+	& \text{ and } \nabla f(\bx) + \nabla \vg(\bx)\bar{\lambda} = \vzero
+\end{frml}
+
+Thm A, on the other hand, characterizes a saddle point of $\mathcal{L}$ as:
+\begin{frml}
+	& \bx \in S, \bar{\lambda} \in \reals^m_{\geq 0}  \\
+	& \forall \vx \in S, \; \mathcal{L}(\bx, \bar{\lambda}) \leq \mathcal{L}(\vx, \bar{\lambda}) \\
+	& \vg(\bx) \leq \vzero \\
+	& \bar{\lambda}^T\vg(\bx) = 0 \\
+\end{frml}
+
+All we need to show, then, is that $\nabla f(\bx) + \sum_{i=1}^m \nabla \vg_i(\bx)\bar{\lambda}_i = \vzero \implies
+\forall \vx \in S, \mathcal{L}(\bx, \bar{\lambda}) \leq \mathcal{L}(\vx, \bar{\lambda})$
+
+Note: $f, \vg_i$ convex functions $\implies \mathcal{L}(\vx, \bar{\lambda}) = f(\vx) + \sum_{i=1}^m \bar{\lambda}_i\vg_i(\vx)$ is also a convex function because
+$\bar{\lambda} \geq 0$.
+
+Let's take the $\nabla_\vx \mathcal{L}(\vx, \lambda) = \nabla f(\vx) + \sum_{i=1}^m \bla_i \nabla \vg_i(\vx)$ and lastly
+note that if we plug $\bx$ into it, then our KKT conditions say that this is equal to $0$.
+But if the gradient of our Lagrangian is $0$, then we are at a global min, by the convexity of all
+of our functions. And thus, $\forall \vx \in S, \mathcal{L}(\bx, \bla) \leq \mathcal{L}(\vx, \bla)$
+\end{proof}
+
+It's worth noting again that, in this formulation, we needed \textit{no constraint qualifications}!
+So we've seen that KKT conditions are sufficient for global optimality, i.e. if
+we find a KKT point of P (when P is a convex program), then that is enough
+to guarantee global optimality. What about for a non-convex program?
+
+\begin{theo}{}{}
+	Let $S$ by a non-empty, open set, and $f, \vg_i: S \rightarrow \reals$ all be
+	twice continuously differentiable. Consider the problem P:
+	\begin{frml}
+		\min f(x) \st \vg(\vx) \leq \vzero, \vx \in S
+	\end{frml}
+	Suppose also $\bx \in S$ is such that $\forall i \in \mathcal{A}_{\bx} \; \nabla^2\vg_i(\bx)$ is
+	PD, $\nabla^2f(\bx)$ is PD, 
+\medskip\\
+\textit{Remember that $\mathcal{A}_{\bx}$ represents the active constraints of $\bx$.}
+\medskip\\
+	Then $\bx$ being a KKT point $\implies$
+	$\bx$ is a local min of P.
+\end{theo}
+
+\begin{proof}[]
+By continuity of $S$ being open, egien values and $\vg, \exists \; \epsilon > 0
+\st
+	N_\epsilon(\bx) \in S$ and:
+\begin{frml}
+	&\forall i \notin \mathcal{A}_{\bx} \; \forall \vx \in N_\epsilon(\bx) \text{ then } \vg(\vx)_i \leq 0 \\
+	&\forall i \in \mathcal{A}_{\bx} \; \forall \vx \in N_\epsilon(\bx) \text{ then } \nabla^2 \vg(\vx)_i \text{ is PSD} \\
+	&\forall \vx \in N_\epsilon(\bx) \text{ then } \nabla^2 f(\vx) \text{ is PSD}
+\end{frml}
+
+Now, consider 
+\begin{frml}
+	\hat P:\;\min f(\vx) \st &\forall i \in \mathcal{A}_{\bx} \; \vg_i(\vx) \leq 0 \\
+	&\vx \in N_\epsilon(\bx)
+\end{frml}
+
+Firstly, note that if $\bx$ is a KKT point of $P$, then it is a KKT point of
+$\hat P$ (by the complimentary slackness, the $\lambda_i$ for the non-active constraints
+are all $0$ anyways).
+
+Now, notice that $\hat P$ is  \textit{convex program!}. $N_{\epsilon}(\bx)$ is an open, convex set,
+and all of our constraints have PSD hessians for all $\vx \in N_\epsilon (\bx)$.
+Thus, if $\bx$ is a KKT point of $\hat P$, then it is a global min of $\hat P$,
+and therefore $\bx$ is a local min of $P$, since $\hat P$ is a ``small local problem''
+within $P$.
+
+\end{proof}
+
+So, we have now shown how to use local convexity (Positive Definiteness of active
+constraints and $f$ at the point $\bx$) to show that KKT points imply local
+minimality of more general problems (i.e. outside the range of \textit{convex} 
+programs).
+
+Note that this ``direction'' of KKT points is a bit of a departure from our 
+previous conversation of KKT points in earlier sections. 
+Remember earlier, we talked about how (with constraint qualifications),
+then $\bx$ being a local min implied that you were a KKT point. This meant that
+when we were solving for optimal points of our problem, we discarded all points that
+were not KKT points. \textit{We can't do that in this case!}. Without 
+Constraint Qualifications, we haven't shown that \textit{all local or global min}
+are KKT points. So we need to be careful here.
+
+
+\subsection{A final example: A different quadratic program}
+
+This section is a slight tanget. We will see how we can use
+the Lagrangian dual to derive a dual problem of a quadratic program with
+inequality constraints that is, in general, much easier 
+to solve \textit{in practice} than the original problem.
+
+Consider a symmetric, Positive Definite matrix $Q \in \reals^{n \times n}$,
+$A \in \reals^{m \times n}, \vc \in \reals^n, \vb \in \reals^m$ and
+the quadratic problem, QP:
+\begin{frml}
+	\min \frac{1}{2}\vx^TQ\vx + \vc^T\vx \st A\vx \geq \vb
+\end{frml}
+
+Earlier, recall that we examined the KKT points of a Quadratic Program with
+equality constraints. Here we have \textit{inequality constraints.}. First,
+we need to convert our constraints into a friendly form:
+\begin{frml}
+	\vg(\vx) = \vb - A\vx \leq \vzero
+\end{frml}
+Then, let's
+write out the Lagrangian of this:
+\begin{frml}
+	\mathcal{L}(\vx, \lambda) = \frac{1}{2}\vx^TQ\vx + \vc^T\vx + \lambda^T\vb -
+	\lambda^TA\vx
+\end{frml}
+defined for all $\vx \in \reals^n, \; \lambda \geq \vzero$.
+
+Now, the dual of this problem is a $\sup \inf$ problem, of the form
+\begin{frml}
+	\forall \lambda \in \reals^m_{\geq 0} \;
+	\Theta(\lambda) = \inf_{\vx \in \reals^n} \frac{1}{2}\vx^TQ\vx + \vc^T\vx + \lambda^T\vb
+	- \lambda^TA\vx
+\end{frml}
+This last term is \textit{fixed} with respect to $\lambda$ (once we pass in
+lambda, it's fixed). \textit{And} it turns out that this function is convex in
+$\vx$, because the Hessian ($Q$ ) is P.D. everywhere. Therefore the solution
+to the $\inf$ is a stationary point... we can simply set 
+$Q\vx + \vc - A^T\lambda = 0$ and solve to get 
+$\vx = Q^{-1}\big(A^T\lambda - \vc\big)$.
+Thus, we can write $\Theta(\lambda)$ as
+\begin{frml}
+	\Theta(\lambda) &= 
+	\frac{1}{2}\big(A^T\lambda - \vc\big)Q^{-1}\big(A^T\lambda - \vc\big) + 
+	\vc^T\bigg(Q^{-1}\big(A^T\lambda - \vc\big)\bigg) + \lambda^T\vb -
+	\lambda^TA\bigg(Q^{-1}\big(A^T\lambda - \vc\big)\bigg) \\
+					&= -\frac{1}{2}\lambda^T\bigg(AQ^{-1}A^T\bigg)\lambda
+					+ \lambda^T\bigg(\vb + AQ^{-1}\vc\bigg) 
+					- \frac{1}{2}\vc^TQ^{-1}\vc
+\end{frml}
+
+So, given any \textit{positive} lambda, if we plug it into $Theta$, the above is
+the result that we will get.
+Thus, we can write the Dual of the Quadratic Program (DQP) as:
+\begin{frml}
+	\max \; -\frac{1}{2}\lambda^T\bigg(AQ^{-1}A^T\bigg)\lambda
+					+ \lambda^T\bigg(\vb + AQ^{-1}\vc\bigg) 
+					- \frac{1}{2}\vc^TQ^{-1}\vc \st \lambda \geq \vzero
+\end{frml}
+
+Call $M = AQ^{-1}A, \vv = \vb + AQ^{-1}\vc, \alpha = \frac{1}{2}\vc^TQ^{-1}\vc$
+which are all constant.
+
+Note that QP is a \textit{convex program}. $\vg_i$ is affine, for all $i$,
+the hessian of $f$ is P.D., and our feasible region is closed and convex. 
+Additionally, we have a constraint qualification holding.
+Thus, we know that we have a KKT point and that the KKT point is the global min
+of this problem. In particular, this means that we have no duality gap, so QP
+and DQP are equivalent to each other.
+
+Now, note additionally that $AQ^{-1}A^T$ is positive semi-definite:
+\begin{frml}
+	\forall \vz, \; \vz^TAQ^{-1}A^T\vz = \vy^TQ^{-1}\vy \geq 0
+\end{frml}
+because of the positive definiteness of Q.  If $A$ is full row-rank,
+then $\forall \vz \neq \vzero, \; A^T\vz \neq 0 $.
+
+\textit{Note: We cannot just arbitrarily row-reduce $A$ to make it full row-rank in
+this case, because we are dealing with inequalities! Regardless, we can see
+that the objective function of DQP is convex.}
+
+Now, we know that the problems DQP and QP have equivalent solutions (there is
+no duality gap). We additionally can see that solving DQP is similarly 
+difficult to solving QP, as they are both convex (or concave) quadratic programs.
+However, here's the punchline: \textit{The constraints for DQP are vastly easier to
+work with than the constraints of QP.} It is much, much easier to solve problems
+in which we only need to maintain positivity rather than needing to maintain 
+$A\vx \geq \vb$. So the dual formulation, in this case, gives us a much easier
+type of problem to solve. 
+
+In particular, there is a set of methods (which won't be convered in these notes) 
+that involve solving
+a problem by significantly relaxing the problem's constraints and then \textit{mapping}
+the found solution \textit{back into} the feasible region of the original problem. 
+This is much easier to do with the constraints of DQP than it is with the constraints of QP.
+
+While this is slightly tangential, since we don't cover these methods, they are 
+\textit{extremely popular} in 
+practice, and thus this relation is worth nothing.
+
+

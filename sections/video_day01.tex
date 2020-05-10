@@ -1,0 +1,105 @@
+\pagebreak
+\section{Moving beyond linear problems}
+
+Most sections from now on will largely 
+\textit{not} make the assumption that the problems are linear.
+
+\subsection{Quadratic Programs}
+
+Another set of problems that we will be considering often are \textit{Quadratic
+Programs}. Quadratic programs are often of the following form:
+
+\begin{defn}{Quadratic Program}{}
+	Let $Q \in \reals^{n \times n}, \vc \in \reals^n, \vx \in \reals^n$, and
+	$S \subseteq \reals^n$.
+
+	\medskip
+	A \textbf{Quadratic Program}, QP, is of the form:
+	\begin{frml}
+		\min \vx^TQ\vx + \vc^T\vx \st \vx \in S
+	\end{frml}
+\end{defn}
+
+Note that the gradient and Hessian of this function $f(\vx) = \vx^TQ\vx + \vc^T\vx$ are: 
+
+\begin{frml}
+	\nabla f(\vx) &= Q\vx + \vc \\
+	\nabla^2 f(\vx) &= Q
+\end{frml}
+
+In general, we are going to consider problems where $Q$ is positive definite or
+positive semi-definite. If a single eigenvalue of $Q$ is negative, then this 
+problem is, in general, NP-Hard and thus very difficult to solve. Therefore, 
+when we consider quadratic problems, we will often be considering convex or 
+strictly convex quadratics.
+
+\subsubsection{Existence and Uniqueness of solutions}
+
+Let's consider a less general quadratic program. Let $Q \in \reals^{n\times n}$ be
+symmetric, positive definite. Let $\vc \in \reals^n, \; \vx \in \reals^n$.
+Finally let $\mathcal{S}\subseteq \reals^n$ be a \textit{closed}, non-empty set.
+Consider the problem, QP:
+\begin{frml}
+	\min \vx^TQ\vx + \vc^T\vx \st \vx \in \mathcal{S}
+\end{frml}
+
+\begin{prop}{}{}
+	All notation as above.
+
+	\medskip
+	There $\exists$ a global minimizer of QP. 
+
+	Furthermore, if $\mathcal{S}$ is also convex, then the minimizer is unique.
+\end{prop}
+
+\textit{Note: This last statement cannot be taken for granted. For example, the
+set $\mathcal{S} = \{ \vx : f(\vx) = 35\}$ is a closed, non-empty set. However,
+every point of $\mathcal{S}$ is a global minima!}.
+
+\textit{Note: This problem definition covers a lot of problems that we're interested in.
+For example, if $\mathcal{S}$ is a polyhedral set, then $\mathcal{S}$ is closed and
+convex! Or if $\mathcal{S}$ is defined by a set of functions $g_i \leq 0$ 
+where all $g_i$ are convex and continuous then $\mathcal{S}$ is again a closed,
+convex set.}
+
+\begin{proof}[]
+	Define $f(\vx) = \vx^TQ\vx + \vc^T\vx$. For any  $\vd \in \reals^n \st ||\vd||_2 = 1$,
+	and for any $\alpha \in \reals^n_{\geq 0}$ let $\bx = \alpha*\vd$.
+	\begin{frml}
+		f(\bx) &= \bx^TQ\bx + \vc^T\bx \\
+			   &= \alpha^2\vd^TQ\vd + \alpha\vc^T\vd \\
+			   &\geq^{\diamondsuit} \bigg(\min_{\lambda \in \sigma(Q)} \lambda \bigg)\alpha^2
+			   - ||\vc||_2 \alpha
+	\end{frml}
+
+	\textit{$\diamondsuit$ : The first term of the inequality is a special property
+	of symmetric matrices and unit vectors. This value is bounded by the max
+and min eigenvalues of $Q$, which in this case are always $> 0$, because Q
+is P.D. The second term is due to the fact that $| \vc^T\vd | \leq ||\vc||*||\vd||=||\vc||$
+and thus the minimum value of  $\vc^T\vd = -||\vc||$.}
+
+Note that this bound scales only by $\alpha$. All other terms are constant.
+Additionally, the bound is dominated by $\alpha^2 * \min \lambda$, which is
+positive.
+Thus, for any arbitrary $\vx_0 \in \mathcal{S}$, $\exists \alpha > 0 \st 
+\forall ||\vx||_2 > \alpha \; f(\vx) > f(\vx_0)$. Then define 
+\[B = \{\vx \in \reals^n : ||\vx||_2 \leq \alpha\}\]
+Note that is $B$ is closed and thus $B \cap \mathcal{S}$ is closed. $B$ is bounded,
+and thus $B \cap \mathcal{S}$ is bounded. Therefore, $B \cap \mathcal{S}$ is a
+compact, non-empty set. We know that it's non-empty because, at the very least,
+$\vx_0$ is in it!
+
+Because $B$ is compact and non-empty, we know that there must exist a global min
+of $f$ on $B$, $\vx^*$. Therefore,  $\vx^*$ is a global min of $f$ on $\mathcal{S}$,
+because $\forall \vx \notin B, f(\vx) > f(\vx_0) \geq f(\vx^*)$. Thus a global
+min exists for  $f$ on $\mathcal{S}$.
+
+Finally, assume $\mathcal{S}$ is a convex set. Suppose $\exists$ two global mins,
+$\vx'$ and $\vx''$ for $f$ on $\mathcal{S}$. Let 
+\[D = \{ \vx \in \reals^n : f(\vx) \leq f(\vx')\}\]
+Note that $D \cap \mathcal{S}$ is also a convex set, and thus the line segment
+$[\vx', \vx''] \in D \cap \mathcal{S}$. Thus $f$ is constant along the line segment,
+which is a constradiction as $f$ is strictly convex. Therefore, the global min
+of $f$ on $\mathcal{S}$ is unique.
+
+\end{proof}

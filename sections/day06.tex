@@ -1,0 +1,210 @@
+\subsection{The Simplex Method}
+\label{sec:simplex-method}
+
+\subsubsection{The Simplex Tableau}
+
+Consider an LP in standard form, where $\vA \in \reals^{m \times n}$ is rank  $m$:
+\begin{frml}
+	\min \vc^T\vx \st &\vA\vx = \vb, \\ &\vx \geq \vzero
+\end{frml}
+
+WLOG, $\vA = \mat{B & | & N}$. where $B = \reals^{m\times m}$ invertible. \textit{Since
+$A$ is rank $m$, we can row-reduce to make this true}.
+
+\begin{defn}{Pre-Tableau}{}
+All notation as above.
+
+\medskip
+The \textbf{pre-tableau} is the \textit{augmented matrix} defined as:
+
+\begin{frml}
+	PreT = \mat{1 & -\vc^T & | & 0 \\ \vzero & \vA & | & \vb} =
+	\mat{1 & -\vc^T & | & 0 \\ \vzero & B\;\; |\;\; N & | & \vb} 
+\end{frml}
+
+\end{defn}
+
+In essence, we can think of this augmented matrix as implying that there is some
+slack variable $z \in \reals \st z - \vc^T\vx = 0$ (on the top row), and
+asserting that $A\vx = \vb$ in all the other rows.
+
+However, we are actually interested in \textit{Basic Feasible Tableaus} in the simplex method.
+To convert this into \textit{basic form}, we can use the invertible matrix 
+$H \in \reals^{m+1 \times m+1}$:
+
+\begin{frml}
+	H = \mat{1 & \vc_B^TB^{-1} \\ \vzero & B^{-1}}
+\end{frml}
+
+Which allows us to convert out Pre-tableau into a \textit{basic tableau}:
+
+\begin{defn}{Basic Tableau and Basic Feasible Tableau}{}
+All notation as above.
+
+\medskip
+A \textbf{Basic Tableau} is any tableau of the form:
+\begin{frml}
+	BasicTableau = H \times PreT = 
+	\mat{1 &  \vzero^T  & -\vc_N^T + \vc_B^TB^{-1}N & | & \vc_B^TB^{-1}\vb \\
+	\vzero & I & B^{-1}N & | & B^{-1}\vb}
+\end{frml}
+
+If $B^{-1}\vb \geq \vzero$, then $BasicTableau$ is called the \textbf{Basic
+Feasible Tableau} of basis $B$ with basic feasible solution $\bx = \mat{\bx_B \\ 0}$.
+In this case, we can rewrite the Tableau as:
+
+\begin{frml}
+	\mat{1 & \vzero^T & -\vr_N^T & | & \textbf{ofv}(\bx) \\
+	\vzero & I & \ldots & | & \bx_B}
+\end{frml}
+\end{defn}
+
+Firsly, note that if $B^{-1}\vb \geq \vzero$, then $\bx = \mat{B^{-1}\vb \\ \vzero}$
+is feasible in LP, making it a basic feasible solution and thus making the
+tableau a \textit{basic feasible tableau}).
+
+From any basic tableau, we can derive a couple key things. We can write out
+$z$, our ``slack variable'' for the objective function value in terms of
+the non-basic components of $\vx$:
+\begin{frml}
+	&z - (\vc_N^T - \vc_B^TB^{-1}N)\vx_N = \vc_B^TB^{-1}\vb \\
+	\implies &z = \vc_B^TB^{-1}\vb + (\vc_N^T - \vc_B^TB^{-1}N)\vx_N
+\end{frml}
+which (if $B^{-1}\vb \geq \vzero$) is \textit{exactly} the 
+$\textbf{ofv}(\vx)$ written our with respect to the \textbf{ofv} of the basic
+feasible solution $\bx$ and the reduced cost coefficients:
+\begin{frml}
+	z = \textbf{ofv}(\bx) + r_N^T\vx_N
+\end{frml}
+We can similarly write out the basic components of $\vx$ using the non-basic
+components:
+\begin{frml}
+	\vx_B = B^{-1}\vb - B^{-1}N\vx_N = \bx_B - B^{-1}N\vx_N 
+\end{frml}
+
+Lastly, note that if the top row (not the scalars on either end) is $\leq \vzero$
+in a basic feasible tableau,
+then our bfs is optimal 
+(because they represent the negated reduced cost coefficients).
+
+\subsubsection{Pivoting and the Simplex Method}
+
+The \textbf{Simplex Method} is a way to move from one Basic Feasible Tableau
+to another Basic Feasible Tableau with a few guarantees. 
+One guarantee is that the next BFT is, in fact, a basic feasible
+tableau as well. The other guarantee is that,
+as we iterate, the objective function value of the bfs for the basic feasible
+tableau is always going down or staying constant. 
+Thus, the simplex method is a way of iterating through
+basic feasible solutions of an $(LP)$, via their respective BFTs, until we find
+the optimal BFS.
+
+Let's assume we start with some basic feasible tableau, representing a basic feasible 
+solution.
+
+\begin{frml}
+	InitBFT = \mat{1  & -\hat{\vc}^T & | & z \\ \vzero & \hat{\vA} & | & \hat{\vb}}
+\end{frml}
+
+\begin{algorithm}\label{alg:simplex-method}
+\caption{The Simplex Method}
+	\KwIn{$InitBFT$}
+	\KwOut{The optmal bfs, $\bx$}
+	$CurrBFT \leftarrow InitBFT$\;
+	\While{Top row $-\hat \vc^T$ is not all negative}{
+		Pick any non-basic column (non-identity column), $\hat A^{(j)}$,
+		with top row value  $-\hat \vc_j > 0$\;
+		\If{$\hat A^{(j)} \leq \vzero$}{
+			The problem is unbounded.$^{\diamondsuit}$ Exit\;
+		}
+		$i^* \leftarrow \argmin_{i \in \hat A_{i,j} > 0} 
+		\frac{\hat \vb_i}{\hat A_{i,j}}$, (i.e. pick from the rows whose value
+		$\hat A_{i,j}$ is positive)\;
+		Row reduce $CurrBFT$ to convert column $\hat A^{(j)}$ into the
+		indentity column with a value of $\hat \vc_j = 0$ above it$^{\triangle}$\;
+		$CurrBFT \leftarrow $ new, row-reduced $BFT$\;
+	}
+\end{algorithm}
+
+$\diamondsuit$:
+		Why? $\vx_B = \hat{\vb} - \vx_j\hat{\vA}^{(j)} \geq \vzero$ as
+		$\vx_j \rarrw \infty$. So, we can keep reducing our $\vx_j$ forever,
+		and we'll always have a feasible solution. Additionally, because the
+		$-\hat{\vc}^T_j \geq 0 \implies \vr^T_j \leq 0$, then our ofv is either
+		staying the same of decreasing as $\vx_j \rarrw \infty$.
+
+$\triangle$ : This new tableau is still a basic tableau! We still have the same
+identity property, we've just changed one of the identity columns.
+
+\begin{theo}{}{}
+The result of one iterate of the simplex method is a basic feasible tableau with
+ofv going down.
+
+\medskip
+\textit{I.e. the new $CurrBFT$ is a basic feasible tableau whose basic feasible
+solution, $\bx$, has $\textbf{ofv}(\bx)$ lower than the previous iterate's
+bfs.}
+\end{theo}
+
+\begin{proof}[]
+
+The previous column with identity where $i^*=1$ will no longer be an identity 
+column.  Any other columns with 
+identities will not be touched by the row operations (because those
+columns have $0$ for rows $i^*$. So the property of containing an 
+identity still holds for our tableau, and we can say the same for the
+top row. Thus, we still have a basic tableau.
+
+
+$\forall i \neq i^*$, we now have that our new $\hat{\vb}_i = 
+\hat{\vb}_i - \frac{\hat{\vA}_{i,j}}{\hat{\vA}_{i^*,j}}\hat{\vb_{i^*}}$.
+Note that in this term, we know $\hat{\vb}_i, \hat{\vb}_{i^*} \geq 0$
+and $\hat{\vA}_{i^*,j} > 0$. Thus, if $\hat{\vA}_{i,j} \leq 0$, then we
+know that our new $\hat{\vb}_i > 0$. If $\hat{\vA}_{i,j} > 0$, then we
+know that $\frac{\hat{\vb}_i}{\hat{\vA}_{i,j}} > 
+\frac{\hat{\vb}_{i^*}}{\hat{\vA}_{i^*,j}}$ and thus 
+$\hat{\vb}_i \geq 0$. Therefore, the basic feasible solution for our
+new basis is feasible, 
+
+Lastly, the new $\hat{z} = \hat{z} + 
+\frac{\hat{\vc}_j}{\hat{\vA}_{i^*,j}}\hat{\vb}^{i^*}$. Note that
+$\hat{\vc}_j < 0$ (that's why we picked it), $\hat{\vA}_{i^*,j} > 0$
+(again, that's why we picked it), and $\hat{\vb}_{i^*} \geq 0$ (by
+feasibility). This will always decrease if $\hat{\vb}_{i^*} > 0$,
+otherwise we will stall (which is typically okay).
+\end{proof}
+
+\textit{Note: If $\hat{b}_{i^*} = 0$, then your ofv will not go down for that 
+iteration. This is called \textbf{degeneracy} or \textbf{stalling}. It is not
+uncommon to experience stalling while running this algorithm. However, 
+\textbf{cycling} \textit{is} uncommon, and rarely happens.}
+
+\begin{theo}{}{}
+If your $(LP)$ is feasible, and the ofv has a lower bound, then the simplex 
+method will terminate, and $(LP)$ has a solution at the bfs represented by the
+final BFT.
+\end{theo}
+
+\subsubsection{Big-M method}
+
+How do we pick the first basis in the algorithm?
+If we are not given a basis, we can create one.
+Let the original problem, P, be:
+\begin{frml}
+	\min \vc^T\vx \\
+	\st \vA\vx = \vb, \vx \geq \vzero
+\end{frml}
+We can augment P to create an artificial basis. 
+Choose $M >> 0$. Write $P^*$ as:
+\begin{frml}
+	\min \mat{\vc \\ \mathbf{M}}^T \mat{\vx \\ \vw} 
+	\st &\mat{\vA & | & I} \mat{\vx \\ \vw} = \vb, \\&\mat{\vx \\ \vw} \geq \vzero
+\end{frml}
+
+Note that all the feasible solutions for the original LP are contained within
+the feasible solutions for this new LP, since they are obtained by setting
+$\vw = \vzero$. Since $M >> 0$, it will never be optimal to have a solution in
+this new $(LP)^*$ where $\vw \neq \vzero$, and thus we should recover a solution
+that works equally as well for our original LP.
+However, importantly, our augmented $\vA$ matrix already contains an identity
+in it, which constitutes as our fist basis!

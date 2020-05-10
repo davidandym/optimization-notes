@@ -1,0 +1,91 @@
+\subsection{Barrier Methods}
+
+Lastly, we will be considering \textit{Barrier Methods} of optimization,
+which are sometimed also called ``\textit{interior penalty function method}''.
+Similar to penalty methods, this will be a way of fitting our constrained
+optimization problems into an unconstrained setting.
+However, whereas in penalty methods we were largely considering points that were not
+feasible, or \textit{exterior}, in barrier methods we will find our way through
+feasible points, or \textit{interior points}, until we find ourselves on the
+boundary of our region.
+
+Consider the problem P:
+\begin{frml}
+	\min f(\vx) \st &\vg(\vx) \leq \vzero\\
+					&\vx \in S
+\end{frml}
+where $S \subseteq \reals^n$ is non-empty, and all functions $f, g_i$ are
+continuous.
+
+
+\begin{defn}{Barrier Function}{}
+	Define $\Lambda: (-\infty, 0) \rightarrow \reals$ be a continuous, non-negative
+	function such that 
+	\begin{frml}
+		\lim_{t \rightarrow 0} \Lambda (t) = \infty
+	\end{frml}
+	A \textbf{barrier function}
+		$B: \{ \vx \in S : \vg(\vx) < \vzero \} \rightarrow \reals$
+	is defined by
+	\begin{frml}
+		B(\vx) = \sum_{i = 1}^m \Lambda(\vg_i(\vx))
+	\end{frml}
+\end{defn}
+
+\textit{Note: As a $\vg_i(\vx)$ get's closer to 0, the value of $\Lambda(\vg_i(\vx))$
+get's closer to $\infty$. As we get closer and closer to the boundaries of our
+region, the barrier value goes up.}
+
+Examples of $\Lambda$:
+\begin{frml}
+	B(\vx) = -\sum_{i = 1}^m \frac{1}{\vg(\vx)}
+\end{frml}
+and 
+\begin{frml}
+	B(\vx) = -\sum_{i = 1}^m ln(\min\{-\vg_i(\vx), 1\})
+\end{frml}
+\textit{Note: This last one, we can think of as having $0$ value for each constraint
+whose value is} more negative \textit{than $-1$, and otherwise barrier values
+start to occur.}
+
+\begin{defn}{Barrier Auxiliary Function and Problem}{}
+Given any barrier function $B$ and a scalar $\beta > 0$, the
+\textbf{auxiliary function},  $\Psi_\beta: \{ \vx \in S : \vg(\vx) < \vzero \} \rightarrow \reals$,
+is defined by 
+\begin{frml}
+	\Psi_\beta(\vx) = f(\vx) + \beta * B(\vx)
+\end{frml}
+
+\bigskip
+The \textbf{auxiliary problem}, then is defined as $P_\beta$ :
+\begin{frml}
+	\min \Psi_\beta(\vx) \st &\vg(\vx) < \vzero \\
+							 &\vx \in S
+\end{frml}
+\end{defn}
+
+\textit{Note: In this formulation, we have made our feasible region something
+of an open set. Now, we can utilize un-constrained optimization techniques
+inside this set, since the Barrier Function will penalize us heavily for
+approaching the tips of our feasible region. Then, as we dial down the $\beta$ 
+parameter, we are allowed to approach the barrier}.
+
+
+
+\begin{algorithm}\label{alg:barrier}
+\caption{Barrier Function Algorithm}
+	\KwIn{Barrier Function $B$, $\delta \st 0 < \delta < 1$, positive tolerance $\tau$}
+	\KwOut{$\vx^*$ optimal in P}
+	\For{$k = 1, 2, 3, \ldots$ until terminate}{
+		Define auxiliary problem $P_{\delta^k}$ and solve (using unconstrained optimization techniques)\;
+		$\bx \leftarrow$ solution to $P_{\delta^k}$ \;
+		Terminate if $\delta^k * B(\vx)$ is less than $\tau$\;
+	}
+\end{algorithm}
+
+This yields the \textbf{Barrier Function Algorithm}~(Algorithm \ref{alg:barrier}).
+
+
+
+
+

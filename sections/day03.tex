@@ -1,0 +1,317 @@
+\subsection{Conditions of Optimality}
+
+Before we dive into optimality and convexity, we need to cover two extremely
+important types of matrices when considering optimization problems. Namely, positive definite
+and positive semi-definite matrices.
+
+\begin{defn}{Positive (Semi-)Definite Matrices}{}
+	Let $A \in \reals^{n \times n}$ be a symmetric matrix.
+	\bigskip\\
+$\vA$ is \textbf{positive definite (PD)}
+if $\forall \vd \in \reals^n, \vd \neq \vzero$, $\vd^T\vA\vd > 0$.
+\bigskip\\
+$\vA$ is \textbf{positive semi-definite (PSD)}
+if $\forall \vd \in \reals^n, \vd \neq \vzero$, $\vd^T\vA\vd \geq 0$.
+\end{defn}
+
+\begin{theo}{}{}
+Let $A \in \reals^{n\times n}$, symmetric. 
+A is (PD / PSD) iff the eigenvalues of $\vA$ are all ($> 0$ / $\geq 0$).
+ \end{theo}
+
+
+\begin{theo}{1st order necessary condition of optimality}{}
+Let $S \subseteq \reals^n$ be an open set, $f:S \rightarrow \reals$ be continuously 
+differentiable,
+and $P : \min f(\vx) \st \vx \in S$.
+\bigskip\\
+If $\bar{\vx}$ is a local min of $P$, then $\nabla f(\bx) = 0$.
+\end{theo}
+
+\begin{proof}[]
+The proof is just that if you do not have 0 gradient, then you have a descent 
+direction (namely, $\vd = -\nabla f(x)$, in which case you are not at a local minimum.
+\end{proof}
+
+\begin{theo}{2nd order necessary condition of optimality}{}
+Let $S \subseteq \reals^n$ be an open set, $f:S \rightarrow \reals$ be \textit{twice} 
+continuously differentiable, and $P : \min f(\vx) \st \vx \in S$.
+\bigskip\\
+If $\bx \in S$ is a local min of $P$ then $\nabla^2 f(\bx)$ is PSD.
+\end{theo}
+
+\begin{proof}[]
+Otherwise $\exists \vd \in \reals^n, \vd \neq \vzero, 
+\st \vd^T \nabla^2f(\bx)\vd < 0$. Then $\forall \alpha > 0, \; \exists \vz 
+\in (\bx, \bx + \alpha \vd)$ where 
+\begin{frml}
+	f(\bx + \alpha \vd) = f(\bx) + \nabla f(\bx)^T \vd \alpha + 
+	\frac{1}{2}\vd^T \nabla^2 f(z) \vd \alpha^2
+\end{frml}
+Note that $\nabla f(\bx)^T \vd \alpha = 0$ by the 1st order necessary condition.
+
+Now, by the continuity of $\nabla^2 f$, $\vd^T \nabla^2 f(\vz) \vd < 0$ for
+$\alpha > 0$ small enough. This means $\vd$ is a descent direction, which means
+$\bx$ is not a local min!
+\end{proof}
+
+\begin{theo}{2nd order sufficient condition of optimality}{}
+Let $S \subseteq \reals^n$ be an open set, $f:S \rightarrow \reals$ be \textit{twice} 
+continuously differentiable, and $P : \min f(\vx) \st \vx \in S$.
+\bigskip\\
+If $\bx \in S$ satisfies $\nabla f(\bx) = \vzero$ and $\nabla^2 f(\bx)$ is PD, 
+then $\bx$ is a strict local min of $P$.
+\end{theo}
+
+\begin{proof}[]
+Take any direction $\vd$, $||\vd|| = 1$, and any $\alpha > 0$ small enough.
+Then we can apply Taylor: $\exists \vz \in (\bx, \bx + \alpha \vd) \st$
+\begin{frml}
+	f(\bx + \alpha \vd) = f(\bx) + \nabla f(\bx)^T \vd \alpha + \frac{1}{2} 
+	\vd^T \nabla^2 f(\vz) \vd \alpha^2
+\end{frml}
+Note again that, since $\bx$ is a local min, $\nabla f(\bx) = 0$. Additionally,
+by the continuity of $\nabla^2 f$, we have that $\nabla^2 f(z)$ is also PD when
+$\alpha > 0$ is small enough, so \textbf{no matter what your $\vd$ is} you will
+always increase the value of $f$ is you move in that direction, $\vd$, for 
+$\alpha$ steps.  Thus, $\bx$ is a strict local min.
+\end{proof}
+
+It's worth noting here that if $\nabla f(\bx) = 0$ and $\nabla^2 f(\bx)$ is PSD,
+then \textbf{this does not imply $\bx$ is a local min!}. It is a necessary, but
+not sufficient condition in that case \textit{e.g. consider $f(x) = x^3$}.
+
+\subsection{Convex Sets}
+
+\begin{defn}{Convex Set}{}
+$S \subseteq \reals^n$ is called convex if $\forall \vx, \vy \in S, \forall \lambda 
+\in [0, 1]$,
+then $\lambda \vx + (1 - \lambda) \vy \in S$.
+\end{defn}
+
+\begin{prop}{}{}
+\textbf{Proposition}: $S \subseteq \reals^n$ is convex iff $\forall k \geq 1$,
+$\forall \vx^{(1)}, \vx^{(2)}, ... , \vx^{(k)}$, and $\forall \lambda_1, 
+\lambda_2, ..., \lambda_k > 0$ then
+\begin{frml}
+	\sum_{i=1}^k \lambda_i x^{(i)} \in S
+\end{frml}
+\end{prop}
+
+\begin{proof}[]
+The proof consists of showing that you can always break the sum down 
+into sums of pairs, the lowest of which is in the set $S$ by the definition of
+convexity, and the rest which follow from induction. It's a little messy, but
+a very simple proof. I'm omitting the details for sanity's sake.
+\end{proof}
+
+\begin{prop}{}{}
+Suppose $\{ S_{\gamma} \}_{\gamma \in \Gamma}$ is a 
+collection of convex sets in $\reals^n$.
+Then $\cap_{\gamma \in \Gamma} S_{\gamma}$ is a convex set.
+\end{prop}
+
+\begin{defn}{Convex Hull}{}
+For any set $T \subseteq \reals^n$, the convex hull of $T$, $\mathcal{H}(T)$ is
+defined as the intersection over $S$, 
+$$\mathcal{H}(T) = \cap S \in \{S \subseteq \reals^n | T \subseteq S, S \; 
+is \; convex\}$$ 
+\textit{i.e. it's the smallest convex set containing $T$.}
+\end{defn}
+
+\begin{prop}{}{}
+For any integer $k \geq 1$, and some sequence $\vx^1, \vx^2, ..., \vx^k \in
+\reals^n$ the convex hull of that sequence is:
+\begin{frml}
+\mathcal{H}(\{ \vx^1, \vx^2, ..., \vx^k\}) = \bigg\{ \sum_{i=1}^k \lambda_i 
+\vx^i : 
+\lambda_1, ..., \lambda_k \geq 0, \sum_{i=1}^k \lambda_i = 1 \bigg\}
+\end{frml}
+In other words, it's the set defined by all possible weighted linear combinations 
+of the elements of the sequence, such that all the weights sum to $1$.
+\end{prop}
+
+\begin{defn}{Extreme point}{}
+Let $S \subseteq \reals^n$ be convex. \textit{We first show what an extreme point is not.}
+\medskip\\
+$\bx$ is \textbf{not} an extreme point if 
+$\exists \; \vx, \vy \in S, \; \vx \neq \vy$, and  $\exists \; \lambda \in (0, 1) \st$
+$$\bx = \lambda\vx + (1 - \lambda)\vy$$
+
+Otherwise, we say that $\bx$ is an \textbf{extreme point}.
+\bigskip\\
+Equivalently, we can say that if $\bx$ is an extreme point of $S$, then 
+\begin{frml}
+	\forall \vx, \vy \in S, \text{ and } \lambda \in [0,1]
+	\text{ if } \lambda \vx + (1 - \lambda)\vy = \bx \implies \vx = \vy = \bx
+\end{frml}
+\end{defn}
+
+
+Intuitively, we can think of \textit{extreme points} as points which are sort of
+on the boundary of our convex set $S$, and thus cannot be represented as a combination
+of any other pairs of elements in the set (since creating such a pair would
+require a point that was ``past'' the boundary).
+
+\pagebreak
+\subsubsection{Polyhedral Sets}
+
+We now move on to cover Polyhedral Sets. These sets have properties which will
+prove important for our optimization problems. Generally, this is because we will
+consider constrants which take the form of polyhedral sets.
+
+\subsubsection{Hyperplanes and Halfspaces}
+
+\begin{defn}{Hyperplane and Halfspace}{}
+Let $\vp \in \reals^n, \vp \neq \vzero$. 
+\medskip\\
+We define a \textbf{hyperplanes} as precisely any set of the form:
+\begin{frml}
+	\{ \vx \in \reals^n : \vp^T\vx = \alpha \} \st \vp \in \reals^n, 
+	\vp \neq \vzero, \alpha \in \reals
+\end{frml}
+\textit{Note: Hyperplanes are always an $n - 1$ dimension subspace of $\reals^n$.}
+\bigskip\\
+Similarly, we define a halfspace as precisely any set of the form:
+\begin{frml}
+	\{ \vx \in \reals^n : \vp^T\vx \geq \alpha \} \st \vp \in \reals^n, 
+	\vp \neq \vzero, \alpha \in \reals
+\end{frml}
+\end{defn}
+
+Let $\vp \in \reals^n, \vp \neq \vzero$.  Then we say that 
+$\{ \vx \in \reals^n: \vp^T\vx = 0\}$ is a hyperplane \textit{through the 
+origin} with a normal vector $\vp$. 
+If we take some $\bx \in \reals^n$, then 
+$\{\vx \in \reals^n : \vp^T(\vx - \bx) = 0\}$ is a hyperplane through
+$\bx$ with normal vector $\vp$ (as opposed to the origin).
+
+\textit{Intuitively, you can think of a hyperplane separating a space $\reals^n$ in "half", 
+and a half-space is all points on one "side" of the hyperplane.}
+
+\subsubsection{Polyhedral Sets}
+
+\begin{defn}{Polyhedral Set}{}
+A \textbf{polyhedral set} is an intersection of finitely many half-spaces.
+\end{defn}
+
+\begin{prop}{}{}
+	$S \subseteq \reals^n$ is a \textit{polyhedral set} iff
+$\exists \; A \in \reals^{m \times n}, \; \vb \in \reals^m \st
+S = \{ \vx \in \reals^n : A\vx \geq \vb \}$.
+\end{prop}
+
+\begin{proof}[]
+	\textit{We sketch the proof, for simplicity}.
+
+Write 
+$
+A = \begin{bmatrix} \vp^{(1)} \\ \vp^{(2)} \\ \vdots \\ \vp^{(m)} \end{bmatrix},
+\vb = \begin{bmatrix} b^{(1)} \\ b^{(2)} \\ \vdots \\ b^{(m)} \end{bmatrix}
+$.
+Note that $\vx$ satisfies $A\vx = \vb$ iff $\vx$ satisfies
+\begin{frml}
+	\vp^{(1)T}\vx \geq b^{(1)},
+	\vp^{(2)T}\vx \geq b^{(2)}, \ldots, 
+	\vp^{(m)T}\vx \geq b^{(m)}
+\end{frml}
+which is exactly an intersection of hyperspaces.
+\end{proof}
+
+\begin{prop}{}{}
+Polyhedral sets are convex
+\end{prop}
+
+\begin{proof}[]
+$\forall A \in \reals^{m \times n}, \vb \in \reals^n$ consider the 
+polyhedral set $S = \{ \vx \in \reals^n : A\vx \geq \vb \}$. 
+
+Then, for 
+$\forall \vy, \vz \in S, \forall \lambda \in [0, 1]$ we know that
+$A\vy \geq \vb, \; A\vz \geq \vb$, and therefore 
+\begin{frml}
+	A(\lambda\vy + (1 - \lambda)\vz) = \lambda A\vy + (1 - \lambda)A\vz
+	\geq \lambda \vb + (1 - \lambda)\vb = \vb \implies \lambda \vy + 
+	(1 - \lambda)\vz \in S
+\end{frml}
+\end{proof}
+
+\subsubsection{Extreme Points}
+
+\begin{theo}{}{}
+Suppose $A \in \reals^{m \times n} = [A^{(1)} | A^{(2)} | \ldots | A^{(m)} ],
+\vb \in \reals^m$ and 
+$S = \{ \vx \in \reals^n : A\vx = \vb, \vx \geq \vzero\}$.
+\bigskip\\
+\textit{Note that $S$ is a polyhedral set! We can write it as 
+$\bigg\{ \vx \in \reals^n : \begin{bmatrix} A \\ A^{-1} \\ I \\ \end{bmatrix} \vx 
+\geq \begin{bmatrix} \vb \\ -\vb \\ \vzero \\ \end{bmatrix} \bigg\}$}
+\bigskip\\
+Then, for any $\bx \in S$, $\bx$ is an extreme point of $S$ iff $\big\{ A^{(i)}
+\big\}_{\bx_i \neq 0}$ is linearly independent. 
+\medskip\\
+\textit{$\big\{ A^{(i)}
+\big\}_{\bx_i \neq 0}$ is
+the set of columns of $A$ for which the corresponding
+component of $\bx$ is non-zero.}
+\end{theo}
+
+\begin{proof}[]
+	($\impliedby$): 
+Suppose you have $\bx \in S \st 
+\big\{ A^{(i)} \big\}_{\vx_i \neq 0}$ are linearly independent
+and suppose also that $\exists \; \vy, \vz \in S$ and $\lambda \in (0, 1)$ such that 
+$\bx = \lambda \vy + (1 - \lambda)\vz$ \textit{(i.e. assume that $\bx$ is not
+an extreme point).}
+
+Then $\forall i$ where $\bx_i = 0 \implies 0 = 
+\lambda \vy_i + (1 - \lambda) \vz_i$. Since 
+$\lambda, (1 - \lambda) > 0$ and $\vy_i, \vz_i \geq 0$ by membership
+in $S$, we know that $\vy_i = \vz_i = 0$.
+
+Now, note that 
+\begin{frml}
+	A\vx = 
+	\begin{bmatrix}
+		A_{1,1} \vx_1 + A_{1,2} \vx_2 + \ldots + A_{1,n} \vx_n \\
+		A_{2,1} \vx_1 + A_{2,2} \vx_2 + \ldots + A_{2,n} \vx_n \\
+		\vdots \\
+		A_{m,1} \vx_1 + A_{m,2} \vx_2 + \ldots + A_{m,n} \vx_n \\
+	\end{bmatrix}
+	= A^{(1)}\vx_1 + A^{(2)}\vx_2 + \ldots + A^{(n)}\vx_n
+\end{frml}
+
+Therefore, 
+\begin{frml}
+	\vb = \sum_{i: \bx_i \neq 0} \bx_iA^{(i)} = 
+	\sum_{i: \bx_i \neq 0} \vy_iA^{(i)} = 
+	\sum_{i: \bx_i \neq 0} \vz_iA^{(i)} 
+\end{frml}
+
+because both $\vy, \vz$ are in $S$. However, by linear independence,
+this can only be true if $\forall i : \bx_i \neq 0, 
+\bx_i = \vy_i = \vz_i \implies \bx = \vy = \vz$, by our previous result
+about the zero-components of $\bx$. Thus, $\bx$ is an extreme point.
+
+($\implies$):
+Suppose $\bx \in S \st \big\{A^{(i)}\big\}_{\vx_i \neq \vzero}$ is 
+\textbf{not} linearly independent. Then, 
+\begin{frml}
+	&\exists \; \vw \in \reals^n \vw \neq \vzero, \text{ and }
+	\forall i: \vw_i \neq 0 \implies \bx_i \neq 0 \implies \bx_i > 0 \st
+	A\vw = \vzero
+\end{frml}
+\textit{In otherwords, there exists a $\vw \in \reals^n$ with the same non-zero components
+of $\vx$, such that $A\vw = \vzero$.}
+
+Let $\epsilon$ be small enough so that $\hat{\vx} = \bx + 
+\epsilon \vw \geq \vzero$ and $\hat{\hat{\vx}} = \bx - \epsilon \vw \geq
+\vzero$. Because $\vw \neq \vzero, \hat{\vx} \neq \hat{\hat{\vx}}$, and
+since we chose epsilon small enough, $\hat{\vx}, \hat{\hat{\vx}} \geq 
+\vzero$. Additionally, $A\hat{\vx} = A(\bx + \epsilon\vw) = A\bx + \vzero
+= \vb$, and similarly for $\hat{\hat{\vx}}$. Therefore, both $\hat{\vx}, 
+\hat{\hat{\vx}} \in S$.
+
+Finally, we have $\bx = \frac{1}{2}\hat{\vx}  + \frac{1}{2}\hat{\hat{\vx}} \implies
+\bx$ is \textbf{not an extreme point}.
+\end{proof}

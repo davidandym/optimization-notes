@@ -1,0 +1,241 @@
+\subsection{The Gradient and The Hessian}
+
+\begin{defn*}{Gradient}{}
+Suppose $S \subseteq \reals^n$, $S$ is open, and $f: S \rightarrow \reals$ is 
+continuously differentiable. Then the \textbf{gradient} of $f$ at any $x \in S$ is 
+
+\begin{equation*}
+	\begin{aligned}
+	\nabla f(x) = 
+	\begin{bmatrix}
+		\dir{f(\vx)}{\vx_1}\\
+		\dir{f(\vx)}{\vx_2} \\
+		\vdots\\
+		\dir{f(\vx)}{\vx_n}
+	\end{bmatrix}
+\end{aligned}
+\end{equation*}
+\end{defn*}
+
+\begin{defn}{Hessian}{}
+Suppose $S \subseteq \reals^n$, $S$ is open, and $f: S \rightarrow \reals$ is 
+twice cont. diff. The \textbf{Hessian} of $f$ at any $\vx \in S$ is
+
+\begin{frml}
+	\nabla^2 f(x) = 
+	\begin{bmatrix}
+		\secdir{f(\vx)}{\vx_1}{\vx_1} & \cdot \cdot \cdot & \secdir{f(\vx)}{\vx_1}{\vx_n}\\
+		\vdots& \ddots & \vdots\\
+		\secdir{f(\vx)}{\vx_n}{\vx_1} & \cdot \cdot \cdot & \secdir{f(\vx)}{\vx_n}{\vx_n}\\
+	\end{bmatrix}
+\end{frml}
+
+\textit{This is a symmetric matrix!}
+\end{defn}
+
+\pagebreak
+\section{Convexity}
+
+\subsection{Taylor Series}
+
+We'll introduce Taylor Series in 1-dimension first, and then expand the definition
+to multiple dimensions. These theorems and approximations will be essential for 
+some of our methods much later on.
+
+\subsubsection{Taylor's Theorem in 1-dim}
+
+\begin{defn}{k-th Order Taylor Polynomial}{}
+Suppose $f: (a,b) \rightarrow \reals$ is $k$-times cont. diff. for a non-neg
+integer $k$. Let $\bar{x} \in (a,b)$.
+
+\[
+P_{\bar{x}, k}(x) \approx f(\bar{x}) + f'(\bar{x})(x - \bar{x}) +
+\frac{1}{2!}f''(\bar{x})(x - \bar{x})^2 + \cdot \cdot \cdot +
+\frac{1}{k!}f^{(k)}(\bar{x})(x - \bar{x})^k
+\]
+
+\textit{This is a Taylor Series expansion which approximates $f(x)$ about $\bar{x}$.}
+\end{defn}
+
+
+\begin{theo}{Taylor's Theorem}{}
+Suppose $f: (a,b) \rightarrow \reals$ is $k+1$-times cont.
+diff. for some non-negative integer $k$, AND suppose $\bar{x} \in (a,b)$. Then
+$\forall x \in (a,b)$, $\exists \xi \in (x, \bar{x})$ such that
+
+\begin{frml}
+	f(x) = P_{\bar{x}, k}(x) + R_{\bar{x}, k}(\xi) =
+	f(\bar{x}) &+ f'(\bar{x})(x - \bar{x}) +
+	\frac{f''(\bar{x})}{2!}(x - \bar{x})^2 + \ldots +
+	\frac{f^{(k)}(\bar{x})}{k!}(x - \bar{x})^k \\ &+ 
+\frac{1}{(k+1)!}f^{(k+1)}(\xi)(x - \bar{x})^{(k+1)}
+\end{frml}
+
+\bigskip
+Where the last term here, $R_{\bx, k}(\xi)$, is called the \textit{remainder}.
+
+\textit{Note that this is an equality, not an approximation as in the Taylor Polynomials}
+\end{theo}
+
+Now we want to scale up this theorem to higher-dimensional spaces, since
+we are often dealing with points in $\reals^n$ and gradients rather than
+derivatives.
+
+
+\subsubsection{Scaling Taylor up to n-dimensions}
+
+Now, we want to scale this up to higher dimensions, so we can approximate 
+multi-dimensional functions about a single point.
+To do this, let's start by noting the following:
+
+Let $S \subseteq \reals^n$. For every linear function $f: S \rightarrow \reals$
+we can say $\forall \bar{\vx} \in \reals^n$, $\exists \vb \in \reals^n, 
+c \in \reals$ such that 
+
+\begin{frml}
+		f(\vx) = c + \vb^T(\vx - \bar{\vx})
+\end{frml}
+i.e. we can \textit{translate} the function to be $\bar{\vx}$-centric. 
+Note also that the gradient $\nabla f(\vx) = \vb$.
+
+We can do the same for any quadratic function $f: S \rightarrow \reals$, i.e.
+we can say $\forall \bar{\vx} \in \reals^n$, $\exists \vA \in \reals^{n \times n}$,
+$\exists \vb \in \reals^n, c \in \reals$ such that
+\begin{frml}
+		f(\vx) = c + \vb^T(\vx - \bar{\vx}) + \frac{1}{2}(\vx - 
+		\bar{\vx})^T\vA(\vx - \bar{\vx})
+\end{frml}
+Note here that the hessian $\nabla^2f(\vx) = \vA$.
+
+These translations allow us to begin building up a version of Taylor Approximations
+in $n$ dimensions, eventually leading to a multi-dimensional version of 
+Taylor's Theorem.
+
+\begin{defn}{$n$-dimension Taylor Approximations}{}
+\textbf{Zero'th Order Taylor Approximation:}
+
+\bigskip
+Let $S \subseteq \reals^n$ be open. Also, $f: S \rightarrow \reals$ is cont.
+and $\bar{\vx} \in S$.
+\begin{frml}
+	P_{\bar{\vx}, 0}(\vx) = f(\bar{\vx})
+\end{frml}
+is the zero'th order taylor approximation of f about $\bar{\vx}$.
+
+\bigskip
+\textbf{First Order Taylor Approximation:}
+\bigskip
+
+Let $S \subseteq \reals^n$ be open. Also, $f: S \rightarrow \reals$ is cont. 
+diff. and $\bar{\vx} \in S$.
+\begin{frml}
+	P_{\bar{\vx}, 1}(\vx) = f(\bar{\vx}) + \nabla f(\bar{\vx}) (\vx - \bar{\vx})
+\end{frml}
+is the first order taylor approximation of f about $\bar{\vx}$, and is sometimes called
+the \textbf{tangent hyperplane}.
+\bigskip
+
+\textbf{Second Order Taylor Approximation:}
+\bigskip \\
+Let $S \subseteq \reals^n$ be open. Also, $f: S \rightarrow \reals$ is twice 
+cont.  diff. and $\bar{\vx} \in S$.
+\begin{frml}
+	P_{\bar{\vx}, 1}(\vx) = f(\bar{\vx}) + \nabla f(\bar{\vx}) (\vx - \bar{\vx})
+	+ \frac{1}{2}(\vx - \bar{\vx})^T \nabla^2 f(\bar{\vx}) (\vx - \bar{\vx})
+\end{frml}
+is the second order taylor approximation of f about $\bar{\vx}$.
+\end{defn}
+
+Now, as before, let $S \subseteq \reals^n$ be an open set, $f: S \rightarrow \reals$, 
+ $\bar{\vx}, \; \vd \in \reals^n$, $\vd \neq \vzero$.
+Then, $\forall \alpha \in \reals$ such that $\bar{\vx} + \alpha \vd \in S$,
+define 
+\begin{frml}
+g_{\bar{\vx}, \vd}(\alpha) = f(\bar{\vx} + \alpha \vd)
+\end{frml}
+
+\begin{prop}{Gradients of $g_{\bx, \vd}$}{}
+Assume $f$ is cont. diff. Then 
+
+\begin{frml}
+\frac{\delta g}{\delta\alpha}g_{\bar{\vx},\vd} (\alpha) = \nabla f(\bar{\vx} + \alpha \vd)^T \vd
+\end{frml}
+
+Assume $f$ is twice cont. diff. Then 
+
+\begin{frml}
+\frac{\delta^2g}{\delta^2\alpha}g_{\bar{\vx},\vd} (\alpha) = \vd^T \nabla^2 f(\bar{\vx} + \alpha \vd) \vd
+\end{frml}
+\end{prop}
+
+\begin{defn}{Descent Direction}{}
+
+If $\exists \; \beta > 0$ such that $0 < \alpha < \beta$ and 
+\begin{frml}
+	f(\bar{\vx}) >
+f(\bar{\vx} + \alpha\vd)
+\text{ i.e. } g_{\bx, \vd}(0) > g_{\bx, \vd}(\alpha)
+\end{frml}
+then $\vd$ is a \textbf{descent direction} for $f$ at $\bar{\vx}$.
+Another way to write this is if $f$ is cont. diff. and $\nabla f(\bar{\vx})^T 
+\vd < 0$ then $d$ is a descent direction for $f$ at $\bar{\vx}$
+\bigskip \\
+The \textbf{direction of steepest descent}
+is just $-\nabla f(\bar{\vx})$ because it minimizes $\nabla f(\bar{\vx})^T \vd$
+for all $\vd, \text{ where } ||\vd|| = ||\nabla f(\bar{\vx})||$.
+\end{defn}
+
+Now, we have everything we need to build up a first and second order Taylor Theorem
+in $n$-dimensions.
+
+\begin{prop}{$n$-dimensional Taylor's Theorem}{}
+	Let $f$ be continuously differentiable. Further, let $\bx \in S, \vd \in \reals^n$.
+	\bigskip\\
+	Then, $\forall \alpha > 0 \st \bx + \alpha \vd \in S, \exists \; \vz \in (\bx,
+	\bx + \alpha\vd) \st$
+	\begin{frml}
+	f(\bar{\vx} + \alpha \vd) = f(\bar{\vx}) + \nabla f(\vz)^T \vd \alpha
+	\end{frml}
+
+	Let $f$ be twice continuously differentiable, all else as above. Then:
+	\begin{frml}
+	f(\bar{\vx} + \alpha \vd) = f(\bar{\vx}) + \nabla f(\bar{\vx})^T \vd \alpha
+	+ \frac{1}{2!}\vd^T \nabla^2f(\vz)\vd \\
+	\end{frml}
+\end{prop}
+
+\textit{Note that we needed $g$ because it is in the form (i.e. it takes in
+a single real) of the original Taylor Theorem, so we can use it to prove a
+Taylor Theorem for $f$.}
+
+\begin{proof}[$n$-dim. Taylor's Theorem]
+	
+Let $f$ be cont. diff., then by Taylor's Theorem $\exists \;a \in (0, \alpha)$ such 
+that 
+\begin{frml}
+	\Fg (\alpha) = \Fg(0) + \Fg'(a)\alpha
+\end{frml}
+Notice that, by the definition of $\Fg$, this is essentially saying that 
+$\exists \vz \in (\bar{\vx}, \bar{\vx} + \alpha \vd)$ such that 
+\begin{frml}
+	f(\bar{\vx} + \alpha \vd) = f(\bar{\vx}) + \nabla f(\vz)^T \vd \alpha
+\end{frml}
+We can repeat this for the second derivative, i.e. let $f$ be twice cont. diff.
+then by Taylor $\exists b \in (0, \alpha)$ such that 
+\begin{frml}
+	\Fg (\alpha) = \Fg(0) + \Fg'(0)\alpha + \frac{\Fg ''(b)b \alpha^2}{2!}
+\end{frml}
+Which again, implies 
+$\exists \vz \in (\bar{\vx}, \bar{\vx} + \alpha \vd)$ such that 
+\begin{frml}
+	f(\bar{\vx} + \alpha \vd) &= f(\bar{\vx}) + \nabla f(\bar{\vx})^T \vd \alpha
+	+ \frac{1}{2!}\vd^T \nabla^2f(\vz)\vd \\
+&= P_{\bar{\vx}, 1} (\vx) + R_{\bx,1}(\vz)
+\end{frml}
+\end{proof}
+
+This is generally as far as we'll care to go, since we'll rarely go beyond examining
+quadratic functions in the class. So now we've achieved a Taylor 
+Theorem which holds in $\reals^n$ for our function $f$.
+This will be important
+for proving conditions for optimality and convexity, etc.

@@ -1,0 +1,221 @@
+
+\subsection{Using the KKT Conditions}
+
+We will now examine how our KKT conditions can apply to some problems
+that we've seen before, and how it can aid us in solving these problems.
+
+As a general formulation, 
+define a problem $P$, as \[\min f(x) \st \vg(x) \leq \vzero,
+\; \vx \in S\] where $S$ is some open set, and $f$ and all of our $g_i$'s are
+continuously differentiable.
+By KKT, if $\vx$ is feasible, and is a local min of P, and our constraint 
+qualification (cq) is satisfied, then we have
+\begin{frml}
+	&\nabla f(\vx) + \nabla \vg(\vx) \vlambda = \vzero, \\
+	&\vlambda^T \vg(\vx) = 0, \\
+	&\vlambda \geq \vzero
+\end{frml}
+\textit{Note: The constraint qualification that we used in the definition was 
+	that our active constraint gradients were linearly independent. 
+However, there are \textit{many} types of constraint qualifications that we could 
+use to satisfy the definition.}
+
+Now, we are interested in using these KKT conditions to \textit{find} optimality, 
+rather than just \textit{verify} it. 
+To see an example of this, let's revisit a simple linear program.
+
+\subsubsection{KKT Conditions for a Linear Program}
+
+Let $A \in \reals^{m \times n}, \vb \in \reals^m, \vc \in \reals^n$.
+Lets define the following linear program P, with variables $\vx \in \reals^n$:
+\begin{frml}
+	\min \vc^T\vx \st &A\vx \geq \vb, \\ &\vx \geq \vzero
+\end{frml}
+
+We can rewrite P as:
+\begin{frml}
+	\min \vc^T\vx \st &\mat{-\vA \\ -I} \vx +
+	\mat{\vb \\ \vzero} \leq \vzero, \\ &\vx \in \reals^n
+\end{frml}
+
+This is now in the form we want! We have our $\vg$ and our $f$ for our
+KKT conditions, and our feasible region $S = \reals^n$, which is a nice, open set. 
+So suppose now that we have some local min $\bx$. What do the KKT conditions
+say about this point?
+
+\begin{enumerate}
+	\item Firstly, we know what $\bx$ is feasible:
+\begin{frml}
+	\vA\bx \geq \vb, \\
+	\bx \geq \vzero
+\end{frml}
+\item We also have that our KKT multipliers are $\geq 0$:
+\begin{frml}
+	\vlambda = \mat{\by \\ \bz} \geq \vzero, \by \in \reals^m, \; \bz \in 
+	\reals^n
+\end{frml}
+\item
+We have the complimentarity of our $\vg$ and $\vlambda$
+\begin{frml}
+	\mat{\by \\ \bz}^T \mat{\vb - \vA\bx \\ -\bx} = 0 \\
+\end{frml}
+\item and lastly, we have the gradient constraints of KKT:
+\begin{frml}
+	\vc + \mat{-\vA^T & | & -I}\mat{\by \\ \bz} = \vzero
+\end{frml}
+\end{enumerate}
+
+From (2), we know that $\by, \bz \geq \vzero$. From (3), we also see that
+$\by^T(\vb - \vA\vx) = 0$ and that $\bz^T\bx = 0$. Finally, from (4) we see that
+$\vA^T\by + \bz = \vc$, which we can rewrite as $\bz = \vc - \vA^T\by$.
+We have a lot of information about $\bz$! We can use this to
+write it out of the equation:
+\begin{enumerate}
+	\item Feasibility, same as before
+\begin{frml}
+	\vA\vx \geq \vb, \\
+	\vx \geq \vzero
+\end{frml}
+\item
+	We substitute $\bz = \vx - \vA^T\by$ in, to get:
+\begin{frml}
+	\mat{\by \\ \vc - \vA^T\by} \geq \vzero \implies
+	\vA^T\vy \leq \vc, \; \vy \geq \vzero
+\end{frml}
+which is \textit{exactly} dual feasibility of $\by$!
+\item and lastly, subbing it into the complimentarity condition, we get:
+\begin{frml}
+	\by^T \perp \vA\bx - \vb 
+	\text{ and } \bx \perp \vc - \vA^T\by
+\end{frml}
+which is exactly our LP complementary slackness!
+\item the 4th condition gets written into all the other conditions, implicitly,
+	by our substitution.
+\end{enumerate}
+
+This is a translation for what the KKT conditions mean for us in a linear
+program! They are \textit{exactly} the necessary and sufficient conditions
+for optimality in a LP! Primal and Dual feasibility, and complementary slackness.
+
+\subsubsection{KKT Conditions for Quadratic Programs with Equalities}
+
+Let's start with a simple quadratic problem formulation.
+Suppose $Q \in \reals^{n \times n}$ is symmetric, P.D.,
+$\vA \in \reals^{m \times n}, \vc \in \reals^n, \vb \in \reals^m$.
+Define the quadratic program, QP as: 
+\begin{frml}
+	\min \frac{1}{2} \vx^TQ\vx - \vc^T\vx,
+	\st &\vA\vx = \vb, \\ &\vx \in \reals^n
+\end{frml}
+
+We can rewrite the constraints into ``KKT-friendly'' form...  
+\begin{frml} \min \frac{1}{2} \vx^TQ\vx - \vc^T\vx,
+	\st &\vA\vx - \vb = \vzero, \\
+		&\vx \in \reals^n
+\end{frml} 
+where now we can say that $\nabla f(\vx) = Q\vx - \vc$, and
+$\nabla \vg(\vx) = \vA^T$.
+
+\label{sec:kkt-trick}
+\textit{Note: here that we have equalities, where we typically require inequalities for
+KKT. We can easily convert this into inequalities, by doing the $\leq, \geq$ trick.
+This actually removes positive constraints on our $\vlambda$ vector, since you have the 
+subtraction of two positives in the eventual formula. Thus, our KKT conditions
+are actually simplified. Additionally, we lose the complimentarity constraints,
+since the constraints are always active.}
+
+Thus, the KKT conditions when $\vx$ is feasible ($\vA\vx = \vb$) and is a local min
+of QP are:
+\begin{frml}
+Q\vx - \vc + \vA^T\vy = \vzero
+\end{frml}
+i.e. $\vx \in \reals^n$ is a solution iff $\exists \; \vy \in \reals^m \st
+\mat{Q & \vA^T \\ \vA & \vzero} \mat{\vx \\ \vy} = \mat{\vc \\ \vb}$.
+
+This big matrix enforces a few things
+\begin{itemize}
+	\item $Q\vx + \vA^T\vy = c$ (KKT condition)
+	\item $\vA\vx = \vb$ (primal feasibility)
+\end{itemize}
+and that's enough to find a solution! Additionally, this big matrix ($M$) is
+square, and in fact invertible, since $Q$ is P.D and we can always make $A$ 
+full row-rank. So we can actually
+solve this exactly! Which gives us an $\vx$ and $\vy$ exactly! And since this
+is a convex QP, the solution is also a global min.
+
+% \subsubsection{An example of solving exactly}
+% 
+% Let's look at one special case of a quadratic program with equalities
+% (which we assume to be feasible).
+% \begin{frml}
+% 	\min ||\vx||_2 \st \vA\vx = \vb
+% \end{frml}
+% Notice here that $Q = I$ and $\vc = \vzero$. This has some interesting repercussions,
+% namely that we have an exact solution for this which we can solve since we can
+% easily take the inverse of this big $M$ matrix.
+% 
+% Note that 
+% \begin{frml}
+% 	\mat{I & \vA^T \\ \vA & \vzero} \mat{I - \vA^T\big( \vA\vA^T\big)^{-1}\vA
+% 		   & \vA^T\big(\vA\vA^T\big)^{-1} \\ \big(\vA\vA^T\big)^{-1} & 
+% 	-\big(\vA\vA^T\big)^{-1}} = \mat{I & \vzero \\ \vzero & I}
+% \end{frml}
+% by... algebra. Trust. So we know what the inverse of $M$ is.
+% Therefore, 
+% \begin{frml}
+% 	\mat{\vx \\ \vy} = M^{-1}\mat{\vzero \\ \vb} = 
+% \mat{\vA^T(\vA\vA^T)^{-1}\vb \\ -(\vA\vA^T)^{-1}\vb} \implies
+% \vx = \vA^T(\vA\vA^T)^{-1}\vb, \; \vy = -(\vA\vA^T)^{-1}\vb
+% \end{frml}
+% which is a nice exact solution which you'll just have to kind of trust me is 
+% correct. But you can see that for this Quadtratic Program, the KKT conditions
+% have given us a nice way to find an exact solution.
+% 
+% This really displays the power of the KKT conditions - they give us new ways
+% to solve our programming problems to find optimal solutions! And in the case of
+% linear and quadratic problems, these are global solutions!
+
+\subsubsection{A bit on Quadratic Programs with Inequalities}
+
+Let's look at an example of a QP with inequality constraints.
+Let $\vA \in \reals^{n \times n}$ symmetric PD, $\vb \in 
+	\reals^m \text{non-zero}, \vc \in \reals^n_{> 0}$:
+\begin{frml}
+	\min \frac{1}{2} \vx^T\vA\vx, \;
+	\st \vb^T\vx + \vc \leq 0
+\end{frml}
+Note that our $f$ is convex (yay) and our $g$ (we only have one!) is affine 
+(yay). Moreover, the gradients are: $$\nabla f(\vx) = \vA\vx, \nabla g(\vx) = \vb
+\neq \vzero$$
+Let's solve this problem by looking for KKT points. Since $f$ is convex, then
+the KKT points are globally optimal!
+But, we have to consider a couple cases. If $g$ is active for a KKT point, or if
+$g$ is not active.
+Let's consider a KKT point where the constraint $g$ is not active.
+Then KKT \textit{only} tells us that 
+\begin{frml}
+	\nabla f(\vx) = \vA\vx = \vzero \implies \vx = \vzero
+\end{frml}
+If none of our constraints our active, then the only thing KKT has to
+tell us is that an optimal point is a stationary point, which happens only when
+the gradient is $0$. However... $\vx = \vzero$ is not 
+feasible! And so, we \textit{must} have an active constraint for our KKT points
+for this problem.
+So, let's look at when $g$ is active, then. In this case, KKT gives us that
+\begin{frml}
+	\vA\vx + \lambda \vb = \vzero, \; \lambda \geq 0, \; \vb^T\vx + c = 0
+\end{frml}
+Well, we can solve this for $\vx$! $\vA$ is invertible, since it's PD, and thus 
+we can write this out:
+
+\begin{frml}
+	\vx &= \vA^{-1} (-\lambda \vb) \\
+	\vb^T\vA^{-1}(-\lambda \vb) + \vc &= \vzero \\
+	\lambda &= \frac{\vc}{\vb^T\vA^{-1}\vb}
+			&\text{\textit{which is greater than 0, since $\vA$ and $\vA^{-1}$ is P.D.}}
+	\\
+	\bx &= \frac{-c}{\vb^T\vA\vb}\vA^{-1}\vb \\
+\end{frml}
+which gives us a unique solution for $\vx$!
+Thus... KKT has given us an exact solution for this QP 
+with a single inequality constraint.
